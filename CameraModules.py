@@ -11,7 +11,7 @@ class CameraModule:
     def addCamera(self, camera_address):
         self.camera_address_list.append(camera_address)
 
-    def initializeCamera(self):
+    def initializeAllCameras(self):
         for camera_address in self.camera_address_list:
             cap = cv2.VideoCapture(camera_address)
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
