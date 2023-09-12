@@ -13,6 +13,7 @@ class CameraModule:
 
     def initializeAllCameras(self):
         for camera_address in self.camera_address_list:
+            print('Found camera: ' + camera_address)
             cap = cv2.VideoCapture(camera_address)
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
@@ -26,7 +27,8 @@ class CameraModule:
                 if not ret:
                     print("Cannot open camera!")
                 else:
-                    cv2.imwrite('Camera ' + camera_id, frame)
+                    cv2.imwrite('Camera_' + str(camera_id) + '.jpg', frame)
+                    print('Camera ' + str(camera_id) + ' captured')
             camera_id += 1
 
     def captureVideo(self, videtime_between_image_frame):
