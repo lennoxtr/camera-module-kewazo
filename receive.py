@@ -12,6 +12,7 @@ def setup_can_object():
     return can0
 
 def do_something(RM_speed, cameraModule):
+    print("Current RM speed received is: " + str(RM_speed))
     if (RM_speed > 10):
         cameraModule.captureImage()
         
@@ -28,7 +29,8 @@ if __name__ == "__main__":
             print("Timeout occured. No message")
         else:
             print(msg)
-            do_something(msg.data, cameraModule=cameraModule)
+            RM_speed = int.from_bytes(msg.data, byteorder='little')
+            do_something(RM_speed=RM_speed, cameraModule=cameraModule)
         
 
     os.system('sudo ifconfig can0 down')
