@@ -14,13 +14,15 @@ def do_something(RM_speed, cameraModule):
     if (RM_speed > 10):
         print("RM SPEED GREATER THAN THRESHOLD. TAKING PICTURES")
         cameraModule.captureImage()
+    else:
+        print("RM NOT MOVING. NO PICTURE TAKEN")
 
 
 if __name__ == "__main__":
+    camera_address_list = ['/dev/video0', '/dev/video2']
     can0 = setup_can_object()
     cameraModule = CameraModule()
-    cameraModule.addCamera('/dev/video0')
-    cameraModule.initializeAllCameras()
+    cameraModule.initializeCameras(camera_address_list=camera_address_list)
 
     while True:
         try:
