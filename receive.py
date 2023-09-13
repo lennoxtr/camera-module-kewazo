@@ -36,3 +36,4 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             cameraModule.closeCamera()
             os.system('sudo ifconfig can0 down')
+            break

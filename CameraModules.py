@@ -1,4 +1,5 @@
 import cv2
+from datetime import datetime
 from multiprocessing import Process
 
 class Camera:
@@ -22,7 +23,8 @@ class Camera:
             if not ret:
                 print("CANNOT OPEN " + self.camera_name)
             else:
-                cv2.imwrite(self.camera_name + '.jpg', frame)
+                image_timestamp = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+                cv2.imwrite(self.camera_name + "_" + image_timestamp + '.jpg', frame)
                 print(self.camera_name + ' CAPTURED')
     
     def captureVideo(self, time_between_image_frame):
@@ -52,20 +54,6 @@ class CameraModule:
 
         for process_capture_image in process_list:
             process_capture_image.join()
-
-        '''
-        camera_id = 0
-        for camera_object in self.camera_object_list:
-            if (camera_object.isOpened()):
-                camera_name = 'CAMERA_' + str(camera_id)
-                ret, frame = camera_object.read()
-                if not ret:
-                    print("CANNOT OPEN " + camera_name)
-                else:
-                    cv2.imwrite(camera_name + '.jpg', frame)
-                    print(camera_name + ' CAPTURED')
-            camera_id += 1
-        '''
 
     def captureVideo(self, time_between_image_frame):
         return
