@@ -16,9 +16,9 @@ class CanHandler:
         os.system('sudo ifconfig can0 down')
     
 class DashboardDataHandler:
-    def __init__(self, RM_speed_threshold):
+    def __init__(self, RM_speed_threshold, camera_address_list):
         self.canHandler = CanHandler.setup_can()
-        self.cameraHandler = CameraHandler(RM_speed_threshold)
+        self.cameraHandler = CameraHandler(RM_speed_threshold, camera_address_list)
 
     def handleMessage(self):
         while True:
@@ -43,5 +43,7 @@ class DashboardDataHandler:
 
 if __name__ == "__main__":
     camera_address_list = ['/dev/video0', '/dev/video2']
-    dashboardDataHandler = DashboardDataHandler(RM_speed_threshold= 10)
+    RM_speed_threshold = 10
+
+    dashboardDataHandler = DashboardDataHandler(RM_speed_threshold, camera_address_list)
     dashboardDataHandler.handleMessage()
