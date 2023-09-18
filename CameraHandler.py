@@ -1,6 +1,7 @@
 import cv2
 from datetime import datetime
 from multiprocessing import Process
+import os
 
 class Camera:
     CAMERA_FRAME_WIDTH = 2560
@@ -24,7 +25,15 @@ class Camera:
                 print("CANNOT OPEN " + self.camera_name)
             else:
                 image_timestamp = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
-                print(self.camera_name + ' CAPTURED')
+                file_name = self.camera_name + "_" + image_timestamp + ".jpg"
+                cv2.imwrite(file_name, frame)
+                try:
+                    os.system('sshpass -f ssh_pass -P 18538 -o StrictHostKeyChecking=np ' + file_name + ' hakan@7.tcp.eu.ngrok.io:/home/hakan/images')
+                    print(self.camera_name + ' CAPTURED')
+                    print(file_name + " UPLOADED")
+
+                except:
+                    print("COULD NOT UPLOAD")
     
     def captureVideo(self, time_between_image_frame):
         return
@@ -33,15 +42,25 @@ class Camera:
         self.camera_object.release()
         print(self.camera_name + " TURNED OFF")
 
-class CameraHanlder:
+class CameraHandler:
     camera_object_list = []
 
-    def initializeAllCameras(self, camera_address_list):
+    def __init__(self, RM_speed_threshold, camera_address_list):
+        self.RM_speed_threshold = RM_speed_threshold
+
         camera_id = 0
         for camera_address in camera_address_list:
             camera_object = Camera(camera_id=camera_id, camera_address=camera_address)
             self.camera_object_list.append(camera_object)
             camera_id += 1
+    
+    def doSomething(self, RM_speed):
+        print("Current RM speed received is: " + str(RM_speed))
+        if (RM_speed < self.RM_speed_threshold):
+            print("RM NOT MOVING. NO ACTION")
+        else:
+            print("RM SPEED GREATER THAN THRESHOLD. TAKING PICTURES")
+            self.captureImage()
 
     def captureImage(self):
         process_list = []
