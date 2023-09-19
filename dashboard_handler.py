@@ -16,8 +16,9 @@ class CanHandler:
         os.system('sudo ifconfig can0 down')
     
 class DashboardHandler:
-    def __init__(self, ssh_pass_file, dashboard_server_address, RM_speed_threshold, camera_address_list):
-        self.ssh_pass_file = ssh_pass_file
+    def __init__(self, ssh_pass_file_name, connection_port, dashboard_server_address, RM_speed_threshold, camera_address_list):
+        self.ssh_pass_file_name = ssh_pass_file_name
+        self.connection_port = connection_port
         self.dashboard_server_address = dashboard_server_address
         self.canHandler = CanHandler.setup_can()
         self.cameraHandler = CameraHandler(RM_speed_threshold, camera_address_list)
@@ -40,22 +41,25 @@ class DashboardHandler:
                 break
 
     def sendImageToDashboard(self):
-        print("LISTING SAVED PATH: " + self.cameraHandler.getSavingDirectory())
+        print("LISTING SAVED PATH: ")
         directory_to_upload = self.cameraHandler.getSavingDirectory()
-        saved_images = os.listdir(directory_to_upload)
-        print(saved_images)
-        #os.system('sshpass -f ssh_pass -P 18538 -o StrictHostKeyChecking=np <file_name> hakan@7.tcp.eu.ngrok.io:/home/hakan/images')
-        return
+        saved_images_list = os.listdir(directory_to_upload.name)
+        print(saved_images_list)
+        for saved_image in saved_images_list:
+            os.system('sshpass -f ' + self.ssh_pass_file_name + ' -p ' + self.connection_port
+                       + ' -o StrictHostKeyChecking=no ' + saved_image + ' ' + self.dashboard_server_address)
 
 
 if __name__ == "__main__":
-    ssh_pass_file = "ssh_pass"
-    dashboard_server_address = "hakan@7.tcp.eu.ngrok.io"
+    ssh_pass_file_name = "ssh_pass"
+    connection_port = "18538"
+    dashboard_server_address = "hakan@7.tcp.eu.ngrok.io:/home/hakan/images"
     camera_address_list = ['/dev/video0', '/dev/video2']
     RM_speed_threshold = 10
 
-    dashboardHandler = DashboardHandler(ssh_pass_file= ssh_pass_file,
-                                                dashboard_server_address= dashboard_server_address,
-                                                RM_speed_threshold= RM_speed_threshold,
-                                                camera_address_list= camera_address_list)
+    dashboardHandler = DashboardHandler(ssh_pass_file_name= ssh_pass_file_name,
+                                        connection_port= connection_port,
+                                        dashboard_server_address= dashboard_server_address,
+                                        RM_speed_threshold= RM_speed_threshold,
+                                        camera_address_list= camera_address_list)
     dashboardHandler.handleMessage()
