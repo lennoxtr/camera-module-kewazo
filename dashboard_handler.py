@@ -33,7 +33,6 @@ class DashboardHandler:
                     print(msg)
                     RM_speed = int.from_bytes(msg.data, byteorder='little')
                     self.cameraHandler.doSomething(RM_speed)
-                    print("TAKING PICTURES OK")
                     self.sendImageToDashboard()
 
             except KeyboardInterrupt:
@@ -44,6 +43,7 @@ class DashboardHandler:
         print("LISTING SAVED PATH: ")
         directory_to_upload = self.cameraHandler.getSavingDirectory().name
         saved_images_list = os.listdir(directory_to_upload)
+        print(saved_images_list)
         while len(saved_images_list) > 0:
             saved_image = saved_images_list.pop(0)
             saving_path = os.path.join(directory_to_upload, saved_image)

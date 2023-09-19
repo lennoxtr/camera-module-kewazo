@@ -35,15 +35,7 @@ class Camera:
                     print(self.camera_name + ' CAPTURED')
                 except:
                     print("COULD NOT SAVE IMAGE")
-                '''
-                try:
-                    os.system('sshpass -f ssh_pass scp -P 18538 -o StrictHostKeyChecking=no ' + file_name + ' hakan@7.tcp.eu.ngrok.io:/home/hakan/images')
-                    print(file_name + " UPLOADED")
 
-                except:
-                    print("COULD NOT UPLOAD")
-                '''
-    
     def captureVideo(self, time_between_image_frame):
         return
 
