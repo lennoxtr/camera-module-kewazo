@@ -42,16 +42,14 @@ class DashboardHandler:
 
     def sendImageToDashboard(self):
         print("LISTING SAVED PATH: ")
-        directory_to_upload = self.cameraHandler.getSavingDirectory()
-        saved_images_list = os.listdir(directory_to_upload.name)
-        print(saved_images_list)
-        for saved_image in saved_images_list:
-            saving_path = os.path.join(directory_to_upload.name, saved_image)
-            saving_path_as_string = saving_path.absolute()
+        directory_to_upload = self.cameraHandler.getSavingDirectory().name
+        saved_images_list = os.listdir(directory_to_upload)
+        while len(saved_images_list) > 0:
+            saved_image = saved_images_list.pop(0)
+            saving_path = os.path.join(directory_to_upload, saved_image)
             os.system('sshpass -f ' + self.ssh_pass_file_name + ' scp -P ' + self.connection_port
-                       + ' -o StrictHostKeyChecking=no ' + saving_path_as_string + ' ' + self.dashboard_server_address)
-
-
+                       + ' -o StrictHostKeyChecking=no ' + saving_path + ' ' + self.dashboard_server_address)
+            os.remove(saving_path)
 if __name__ == "__main__":
     ssh_pass_file_name = "ssh_pass"
     connection_port = "18538"
