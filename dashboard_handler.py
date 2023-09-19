@@ -46,8 +46,10 @@ class DashboardHandler:
         saved_images_list = os.listdir(directory_to_upload.name)
         print(saved_images_list)
         for saved_image in saved_images_list:
-            os.system('sshpass -f ' + self.ssh_pass_file_name + ' -p ' + self.connection_port
-                       + ' -o StrictHostKeyChecking=no ' + saved_image + ' ' + self.dashboard_server_address)
+            saving_path = os.path.join(directory_to_upload.name, saved_image)
+            saving_path_as_string = saving_path.absolute()
+            os.system('sshpass -f ' + self.ssh_pass_file_name + ' scp -P ' + self.connection_port
+                       + ' -o StrictHostKeyChecking=no ' + saving_path_as_string + ' ' + self.dashboard_server_address)
 
 
 if __name__ == "__main__":
