@@ -13,7 +13,7 @@ class Camera:
         self.camera_name = "CAMERA_" + str(camera_id)
         self.camera_address = camera_address
         self.saving_directory = saving_directory
-        self.camera_object = cv2.VideoCapture(camera_address)
+        self.camera_object = cv2.VideoCapture(camera_address, cv2.CAP_V4L)
         print("CAMERA " + self.camera_address + " ADDED OK")
         self.camera_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
         self.camera_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
