@@ -32,6 +32,7 @@ class DashboardHandler:
                     print(msg)
                     RM_speed = int.from_bytes(msg.data, byteorder='little')
                     self.cameraHandler.doSomething(RM_speed)
+                    print("TAKING PICTURES OK")
                     self.sendImageToDashboard()
 
             except KeyboardInterrupt:
@@ -39,6 +40,10 @@ class DashboardHandler:
                 break
 
     def sendImageToDashboard(self):
+        print("LISTING SAVED PATH: " + self.cameraHandler.getSavingDirectory())
+        directory_to_upload = self.cameraHandler.getSavingDirectory()
+        saved_images = os.listdir(directory_to_upload)
+        print(saved_images)
         #os.system('sshpass -f ssh_pass -P 18538 -o StrictHostKeyChecking=np <file_name> hakan@7.tcp.eu.ngrok.io:/home/hakan/images')
         return
 
