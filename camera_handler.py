@@ -24,11 +24,11 @@ class Camera:
             if not ret:
                 print("CANNOT OPEN " + self.camera_name)
             else:
-                image_timestamp = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+                image_timestamp = datetime.now().strftime('%Y-%m-%d_%H.%M.%S')
                 file_name = self.camera_name + "_" + image_timestamp + ".jpg"
                 cv2.imwrite(file_name, frame)
                 try:
-                    os.system('sshpass -f ssh_pass -P 18538 -o StrictHostKeyChecking=np ' + file_name + ' hakan@7.tcp.eu.ngrok.io:/home/hakan/images')
+                    os.system('sshpass -f ssh_pass scp -P 18538 -o StrictHostKeyChecking=no ' + file_name + ' hakan@7.tcp.eu.ngrok.io:/home/hakan/images')
                     print(self.camera_name + ' CAPTURED')
                     print(file_name + " UPLOADED")
 

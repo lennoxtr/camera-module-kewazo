@@ -1,6 +1,6 @@
 import os
 import can
-import CameraHandler 
+from camera_handler import Camera, CameraHandler
 
 class CanHandler:
     @staticmethod
