@@ -51,14 +51,15 @@ class CameraHandler:
         self.savingDirectory = self.setSavingDirectory()
         camera_id = 0
         for camera_address in camera_address_list:
-            camera_object = Camera(camera_id= camera_id, 
-                                   camera_address= camera_address,
-                                   saving_directory= self.savingDirectory)
+            camera_object = Camera(camera_id=camera_id, 
+                                   camera_address=camera_address,
+                                   saving_directory=self.savingDirectory)
             self.camera_object_list.append(camera_object)
             camera_id += 1
     
     def setSavingDirectory(self):
         return tempfile.TemporaryDirectory()
+    
     def getSavingDirectory(self):
         return self.savingDirectory
 
