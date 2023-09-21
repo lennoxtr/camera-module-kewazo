@@ -20,7 +20,7 @@ class Camera:
         print("CAMERA " + self.camera_address + " INITIALIZED OK")
 
     
-    def captureImage(self):
+    def capture_image(self):
         if (self.camera_object.isOpened()):
             ret, frame = self.camera_object.read()
             if not ret:
@@ -36,64 +36,64 @@ class Camera:
                 except:
                     print("COULD NOT SAVE IMAGE")
 
-    def captureVideo(self, time_between_image_frame):
+    def capture_video(self, time_between_image_frame):
         return
 
-    def closeCamera(self):
+    def close_camera(self):
         self.camera_object.release()
         print(self.camera_name + " TURNED OFF")
 
 class CameraHandler:
     camera_object_list = []
 
-    def __init__(self, RM_speed_threshold, camera_address_list):
-        self.RM_speed_threshold = RM_speed_threshold
-        self.savingDirectory = self.setSavingDirectory()
+    def __init__(self, rm_speed_threshold, camera_address_list):
+        self.rm_speed_threshold = rm_speed_threshold
+        self.saving_directory = self.set_saving_directory()
         camera_id = 0
         for camera_address in camera_address_list:
             camera_object = Camera(camera_id=camera_id, 
                                    camera_address=camera_address,
-                                   saving_directory=self.savingDirectory)
+                                   saving_directory=self.saving_directory)
             self.camera_object_list.append(camera_object)
             camera_id += 1
     
-    def setSavingDirectory(self):
+    def set_saving_directory(self):
         return tempfile.TemporaryDirectory()
     
-    def getSavingDirectory(self):
-        return self.savingDirectory
+    def get_saving_directory(self):
+        return self.saving_directory
 
-    def doSomething(self, RM_speed):
-        print("Current RM speed received is: " + str(RM_speed))
-        if (RM_speed < self.RM_speed_threshold):
+    def do_something(self, rm_speed):
+        print("Current RM speed received is: " + str(rm_speed))
+        if (rm_speed < self.rm_speed_threshold):
             print("RM NOT MOVING. NO ACTION")
         else:
             print("RM SPEED GREATER THAN THRESHOLD. TAKING PICTURES")
-            self.captureImage()
+            self.capture_image()
 
-    def captureImage(self):
+    def capture_image(self):
         process_list = []
         for camera_object in self.camera_object_list:
-            process_capture_image = Process(target=camera_object.captureImage())
+            process_capture_image = Process(target=camera_object.capture_image())
             process_capture_image.start()
             process_list.append(process_capture_image)
 
         for process_capture_image in process_list:
             process_capture_image.join()
 
-    def captureVideo(self, time_between_image_frame):
+    def capture_video(self, time_between_image_frame):
         process_list = []
         for camera_object in self.camera_object_list:
-            process_capture_video = Process(target=camera_object.captureVideo(time_between_image_frame))
+            process_capture_video = Process(target=camera_object.capture_video(time_between_image_frame))
             process_capture_video.start()
             process_list.append(process_capture_video)
 
         for process_capture_video in process_list:
             process_capture_video.join()
 
-    def closeCamera(self):
+    def close_camera(self):
         for camera_object in self.camera_object_list:
-            camera_object.closeCamera()
+            camera_object.close_camera()
 
 
 
