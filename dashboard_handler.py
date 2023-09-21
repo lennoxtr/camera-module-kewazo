@@ -1,4 +1,5 @@
 import os
+import shutil
 
 class DashboardHandler:
     MESSAGE_TIMEOUT = 10.0
@@ -46,6 +47,8 @@ class DashboardHandler:
                                                                 dashboard_host_name=self.dashboard_host_name,
                                                                 dashboard_host_ip=self.dashboard_host_ip,
                                                                 dashboard_storage_directory=self.dashboard_storage_directory))
+                shutil.rmtree(images_folder_directory)
+                print("IMAGES UPLOADED")
             except:
                 self.is_connected_to_dashboard = False
                 print("COULD NOT REACH DASHBOARD")
