@@ -5,23 +5,28 @@ from multiprocessing import Process
     
 class CentralHandler:
     MESSAGE_TIMEOUT = 10.0
+    IMAGES_TOP_LEVEL_DIRECTORY = "./images"
+
 
     def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
                   dashboard_storage_directory, rm_speed_threshold, camera_address_list, can_id_to_listen):
         
-        self.can_handler = CanBusHandler.setup_can(can_id_to_listen)
-        self.dashboard_handler = DashboardHandler(ssh_pass_file_name, connection_port, dashboard_host_name,
-                                                   dashboard_host_ip, dashboard_storage_directory)
-        self.camera_handler = CameraHandler(rm_speed_threshold, camera_address_list)
+        self.can_handler = CanBusHandler.setup_can(can_id_to_listen=can_id_to_listen)
+        self.dashboard_handler = DashboardHandler(ssh_pass_file_name=ssh_pass_file_name,
+                                                  connection_port=connection_port,
+                                                  dashboard_host_name=dashboard_host_name,
+                                                  dashboard_host_ip=dashboard_host_ip,
+                                                  dashboard_storage_directory=dashboard_storage_directory, 
+                                                  images_top_level_directory=self.IMAGES_TOP_LEVEL_DIRECTORY)
+        self.camera_handler = CameraHandler(images_top_level_directory=self.IMAGES_TOP_LEVEL_DIRECTORY,
+                                            rm_speed_threshold=rm_speed_threshold,
+                                            camera_address_list=camera_address_list)
 
-    ### TODO: Implement uploading images that were stored before yet not uploaded
     def send_image_to_dashboard(self):
-        images_local_storage_directory = self.camera_handler.get_saving_directory().name
-
-        if self.dashboard_handler.check_dashboard_connection() == True:
-            self.dashboard_handler.send_image_to_dashboard(images_local_storage_directory)
+        while self.dashboard_handler.check_dashboard_connection() == True:
+            self.dashboard_handler.send_image_to_dashboard()
         else:
-            print("SAVING PICTURES LOCALLY")  
+            print("SAVING IMAGES LOCALLY ONLY")  
     
     def handle_can_message(self):
         while True:
@@ -33,8 +38,6 @@ class CentralHandler:
                     print(msg)
                     rm_speed = int.from_bytes(msg.data, byteorder='little')
                     self.camera_handler.do_something(rm_speed)
-                    self.send_image_to_dashboard()
-
             except KeyboardInterrupt:
                 self.camera_handler.close_camera()
                 CanBusHandler.can_down()

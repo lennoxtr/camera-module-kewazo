@@ -14,11 +14,10 @@ if __name__ == "__main__":
 
     while True:
         RM_speed =  int(input("RM simulated speed as integer: "))
-        msg = can.Message(arbitration_id=0x123, data=[RM_speed], is_extended_id=False)
+        msg = can.Message(arbitration_id=0x3A0, data=[RM_speed], is_extended_id=False)
 
         can0.send(msg)
     
-    os.system('sudo ifconfig can0 down')
 
  
 
