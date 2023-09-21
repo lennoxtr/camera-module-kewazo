@@ -7,7 +7,6 @@ class CentralHandler:
     MESSAGE_TIMEOUT = 10.0
     IMAGES_TOP_LEVEL_DIRECTORY = "./images"
 
-
     def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
                   dashboard_storage_directory, rm_speed_threshold, camera_address_list, can_id_to_listen):
         
