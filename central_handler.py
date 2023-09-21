@@ -1,6 +1,7 @@
 from can_bus_handler import CanBusHandler
 from camera_handler import CameraHandler
 from dashboard_handler import DashboardHandler
+from multiprocessing import Process
     
 class CentralHandler:
     MESSAGE_TIMEOUT = 10.0
@@ -13,6 +14,7 @@ class CentralHandler:
                                                    dashboard_host_ip, dashboard_storage_directory)
         self.camera_handler = CameraHandler(rm_speed_threshold, camera_address_list)
 
+    ### TODO: Implement uploading images that were stored before yet not uploaded
     def send_image_to_dashboard(self):
         images_local_storage_directory = self.camera_handler.get_saving_directory().name
 
@@ -37,6 +39,16 @@ class CentralHandler:
                 self.camera_handler.close_camera()
                 CanBusHandler.can_down()
                 break
+    
+    def start(self):
+        process_uploading_images = Process(target=self.send_image_to_dashboard())
+        process_handling_can_messages = Process(target=self.handle_can_message())
+
+        process_uploading_images.start()
+        process_handling_can_messages.start()
+
+        process_uploading_images.join()
+        process_handling_can_messages.join()
 
 if __name__ == "__main__":
     ssh_pass_file_name = "ssh_pass"
@@ -48,7 +60,7 @@ if __name__ == "__main__":
     rm_speed_threshold = 10
     can_id_to_listen = 0x3A0
 
-    dashboard_handler = DashboardHandler(ssh_pass_file_name=ssh_pass_file_name,
+    central_handler = CentralHandler(ssh_pass_file_name=ssh_pass_file_name,
                                         connection_port=connection_port,
                                         dashboard_host_name=dashboard_host_name,
                                         dashboard_host_ip=dashboard_host_ip,
@@ -56,4 +68,4 @@ if __name__ == "__main__":
                                         rm_speed_threshold=rm_speed_threshold,
                                         camera_address_list=camera_address_list,
                                         can_id_to_listen=can_id_to_listen)
-    dashboard_handler.handle_can_message()
+    central_handler.start()
