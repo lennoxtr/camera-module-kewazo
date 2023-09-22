@@ -18,7 +18,7 @@ class DashboardHandler:
         self.is_connected_to_dashboard = self.connect_to_dashboard()
 
     def connect_to_dashboard(self):
-        response_code = os.system(self.SEND_TO_DASHBOARD_COMMAND.format(dashboard_host_ip=self.dashboard_host_ip))
+        response_code = os.system(self.PING_DASHBOARD_COMMAND.format(dashboard_host_ip=self.dashboard_host_ip))
         if response_code == 0:
             print("CONNECTED TO DASHBOARD")
             return True

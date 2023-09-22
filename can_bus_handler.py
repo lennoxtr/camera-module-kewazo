@@ -3,13 +3,15 @@ import can
 
 class CanBusHandler:
     @staticmethod
-    def setup_can(can_id_to_listen):
+    def setup_can(can_id_list_to_listen):
         os.system('sudo ip link set can0 type can bitrate 100000')
         os.system('sudo ifconfig can0 up')
 
         can_channel = 'can0'
         can_bustype = 'socketcan'
-        can_filters = [{"can_id": can_id_to_listen, "can_mask": 0xFFF, "extended": False}]
+        can_filters = []
+        for can_id in can_id_list_to_listen:
+            can_filters.append({"can_id": can_id, "can_mask": 0xFFF, "extended": False})
 
         can0 = can.interface.Bus(channel=can_channel, bustype=can_bustype, can_filters=can_filters)
         print('CAN SETUP OK')

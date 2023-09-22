@@ -7,19 +7,22 @@ class CentralHandler:
     MESSAGE_TIMEOUT = 10.0
     IMAGES_TOP_LEVEL_DIRECTORY = "./images"
 
-    def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
-                  dashboard_storage_directory, rm_speed_threshold, camera_address_list, can_id_to_listen):
+    def __init__(self,liftbot_id, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
+                  dashboard_storage_directory, rm_speed_threshold, camera_address_list, camera_position_mapping, can_id_list_to_listen):
         
-        self.can_handler = CanBusHandler.setup_can(can_id_to_listen=can_id_to_listen)
+        self.liftbot_id = liftbot_id
+        self.can_handler = CanBusHandler.setup_can(can_id_list_to_listen=can_id_list_to_listen)
         self.dashboard_handler = DashboardHandler(ssh_pass_file_name=ssh_pass_file_name,
                                                   connection_port=connection_port,
                                                   dashboard_host_name=dashboard_host_name,
                                                   dashboard_host_ip=dashboard_host_ip,
                                                   dashboard_storage_directory=dashboard_storage_directory, 
                                                   images_top_level_directory=self.IMAGES_TOP_LEVEL_DIRECTORY)
-        self.camera_handler = CameraHandler(images_top_level_directory=self.IMAGES_TOP_LEVEL_DIRECTORY,
+        self.camera_handler = CameraHandler(liftbot_id=liftbot_id,
+                                            images_top_level_directory=self.IMAGES_TOP_LEVEL_DIRECTORY,
                                             rm_speed_threshold=rm_speed_threshold,
-                                            camera_address_list=camera_address_list)
+                                            camera_address_list=camera_address_list,
+                                            camera_position_mapping=camera_position_mapping)
 
     def send_image_to_dashboard(self):
         while self.dashboard_handler.check_dashboard_connection() == True:
@@ -53,21 +56,24 @@ class CentralHandler:
         process_handling_can_messages.join()
 
 if __name__ == "__main__":
+    liftbot_id = "LB1"
     ssh_pass_file_name = "ssh_pass"
     connection_port = "18538"
     dashboard_host_name = "hakan"
     dashboard_host_ip = "7.tcp.eu.ngrok.io"
     dashboard_storage_directory = "/home/hakan/images"
     camera_address_list = ['/dev/video0', '/dev/video2']
+    camera_position_mapping = {0: "left", 1: "right"}
     rm_speed_threshold = 10
-    can_id_to_listen = 0x3A0
+    can_id_list_to_listen = [0x3A0]
 
-    central_handler = CentralHandler(ssh_pass_file_name=ssh_pass_file_name,
-                                        connection_port=connection_port,
-                                        dashboard_host_name=dashboard_host_name,
-                                        dashboard_host_ip=dashboard_host_ip,
-                                        dashboard_storage_directory=dashboard_storage_directory,
-                                        rm_speed_threshold=rm_speed_threshold,
-                                        camera_address_list=camera_address_list,
-                                        can_id_to_listen=can_id_to_listen)
+    central_handler = CentralHandler(liftbot_id=liftbot_id,
+                                     ssh_pass_file_name=ssh_pass_file_name,
+                                     connection_port=connection_port,
+                                     dashboard_host_name=dashboard_host_name,
+                                     dashboard_host_ip=dashboard_host_ip,
+                                     dashboard_storage_directory=dashboard_storage_directory,
+                                     rm_speed_threshold=rm_speed_threshold,
+                                     camera_address_list=camera_address_list,
+                                     can_id_list_to_listen=can_id_list_to_listen)
     central_handler.start()

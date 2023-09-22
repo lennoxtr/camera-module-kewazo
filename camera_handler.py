@@ -1,15 +1,16 @@
 import cv2
-from datetime import datetime, date
+from datetime import datetime
 from multiprocessing import Process
 import os
 
 class Camera:
     CAMERA_FRAME_WIDTH = 2560
     CAMERA_FRAME_HEIGHT = 1440
+    IMAGE_NAMING = "{liftbot_id}_{camera_name}"
 
-    def __init__(self, camera_id, camera_address, main_saving_directory):
-        self.camera_id = camera_id
-        self.camera_name = "CAMERA_" + str(camera_id)
+    def __init__(self, liftbot_id, camera_name, camera_address, main_saving_directory):
+        self.liftbot_id = liftbot_id
+        self.camera_name = camera_name
         self.camera_address = camera_address
         self.main_saving_directory = main_saving_directory
         self.camera_object = cv2.VideoCapture(camera_address, cv2.CAP_V4L)
@@ -22,14 +23,13 @@ class Camera:
     def capture_image(self):
         timestamp_folder_name = datetime.datetime.now().strftime("%H%M%S")
         timestamp_folder_directory = os.path.join(self.main_saving_directory, timestamp_folder_name)
-        os.mkdir(timestamp_folder_directory)
 
         if (self.camera_object.isOpened()):
             ret, frame = self.camera_object.read()
             if not ret:
                 print("CANNOT OPEN " + self.camera_name)
             else:
-                image_file_directory = os.path.join(timestamp_folder_directory, self.camera_name)
+                image_file_directory = os.path.join(timestamp_folder_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name))
                 try:
                     cv2.imwrite(image_file_directory, frame)
                     print(self.camera_name + ' CAPTURED')
@@ -46,13 +46,16 @@ class Camera:
 class CameraHandler:
     camera_object_list = []
 
-    def __init__(self, images_top_level_directory, rm_speed_threshold, camera_address_list):
+    def __init__(self, liftbot_id, images_top_level_directory, rm_speed_threshold, camera_address_list, camera_position_mapping):
+        self.liftbot_id = liftbot_id
         self.images_top_level_directory = images_top_level_directory
         self.rm_speed_threshold = rm_speed_threshold
         self.main_saving_directory = self.set_saving_directory()
+
         camera_id = 0
         for camera_address in camera_address_list:
-            camera_object = Camera(camera_id=camera_id, 
+            camera_object = Camera(liftbot_id=liftbot_id,
+                                   camera_name= camera_position_mapping[camera_id], 
                                    camera_address=camera_address,
                                    main_saving_directory=self.main_saving_directory)
             self.camera_object_list.append(camera_object)
@@ -61,7 +64,8 @@ class CameraHandler:
     def set_saving_directory(self):
         timestamp_saving_folder = datetime.date.today().strftime("%y-%m-%d")
         main_saving_directory = os.path.join(self.images_top_level_directory, timestamp_saving_folder)
-        os.mkdir(main_saving_directory)
+        if not os.path.exists(main_saving_directory):
+            os.mkdir(main_saving_directory)
         return main_saving_directory
     
     def get_saving_directory(self):
