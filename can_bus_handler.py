@@ -4,7 +4,7 @@ import can
 class CanBusHandler:
     @staticmethod
     def setup_can(can_id_list_to_listen):
-        os.system('sudo ip link set can0 type can bitrate 100000')
+        os.system('sudo ip link set can0 type can bitrate 1000000')
         os.system('sudo ifconfig can0 up')
 
         can_channel = 'can0'
