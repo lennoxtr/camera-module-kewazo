@@ -65,7 +65,7 @@ class CameraHandler:
         timestamp_saving_folder = datetime.date.today().strftime("%y-%m-%d")
         main_saving_directory = os.path.join(self.images_top_level_directory, timestamp_saving_folder)
         if not os.path.exists(main_saving_directory):
-            os.mkdir(main_saving_directory)
+            os.makedirs(main_saving_directory)
         return main_saving_directory
     
     def get_saving_directory(self):
