@@ -75,5 +75,6 @@ if __name__ == "__main__":
                                      dashboard_storage_directory=dashboard_storage_directory,
                                      rm_speed_threshold=rm_speed_threshold,
                                      camera_address_list=camera_address_list,
+                                     camera_position_mapping=camera_position_mapping,
                                      can_id_list_to_listen=can_id_list_to_listen)
     central_handler.start()
