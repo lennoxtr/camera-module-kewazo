@@ -11,7 +11,7 @@ class CanBusHandler:
         can_bustype = 'socketcan'
         can_filters = []
         for can_id in can_id_list_to_listen:
-            can_filters.append({"can_id": can_id, "can_mask": 0xFFF, "extended": False})
+            can_filters.append({"can_id": can_id, "can_mask": 0x7FF, "extended": False})
 
         can0 = can.interface.Bus(channel=can_channel, bustype=can_bustype, can_filters=can_filters)
         print('CAN SETUP OK')
