@@ -4,8 +4,7 @@ import shutil
 class DashboardHandler:
     MESSAGE_TIMEOUT = 10.0
     PING_DASHBOARD_COMMAND = 'ping -c 1 {dashboard_host_ip}'
-    SEND_TO_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} scp -P {connection_port} -o StrictHostKeyChecking=no"
-    + " -pr {images_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_storage_directory}"
+    SEND_TO_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} scp -P {connection_port} -o StrictHostKeyChecking=no -pr {images_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_storage_directory}"
 
     def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
                  dashboard_storage_directory, images_top_level_directory):
