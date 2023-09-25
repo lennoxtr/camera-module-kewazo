@@ -62,8 +62,8 @@ if __name__ == "__main__":
     dashboard_host_name = "hakan"
     dashboard_host_ip = "7.tcp.eu.ngrok.io"
     dashboard_storage_directory = "/home/hakan/images"
-    camera_address_list = ['/dev/video0', '/dev/video2']
-    camera_position_mapping = {0: "left", 1: "right"}
+    camera_address_list = ['/dev/video0', '/dev/video2'] # maximum is 4
+    camera_position_mapping = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
     rm_speed_threshold = 10
     can_id_list_to_listen = [0x3A0]
 
