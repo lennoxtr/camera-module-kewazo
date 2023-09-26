@@ -33,9 +33,9 @@ class CentralHandler:
         while True:
             try:
                 msg = self.can_handler.recv()
+                rm_speed_as_bytes = msg[-4:]
                 print(msg)
-                ### TODO: Modify this for CANOpen
-                rm_speed = int.from_bytes(msg.data, byteorder='little')
+                rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little')
                 self.camera_handler.do_something(rm_speed)
             except KeyboardInterrupt:
                 self.camera_handler.close_camera()
