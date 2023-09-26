@@ -67,7 +67,7 @@ if __name__ == "__main__":
     dashboard_storage_directory = "/home/hakan/images"
     camera_address_list = ['/dev/video0', '/dev/video2'] # maximum is 4
     camera_position_mapping = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
-    rm_speed_threshold = 10000 ### Speed threshold is +- 10
+    rm_speed_threshold = 100000 ### Speed threshold is +- 100000
     can_id_list_to_listen = [0x3A0]
 
     central_handler = CentralHandler(liftbot_id=liftbot_id,

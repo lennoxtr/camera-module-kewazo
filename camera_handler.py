@@ -75,9 +75,7 @@ class CameraHandler:
         print("Current RM speed received is: " + str(rm_speed))
         speed_diff = abs(rm_speed - self.last_speed_registered)
 
-        if (speed_diff < self.rm_speed_threshold or rm_speed > 300000):
-            print("NO ACTION")
-        else:
+        if (speed_diff > self.rm_speed_threshold and rm_speed < 300000):
             print("RM SPEED DIFFERENCE GREATER THAN THRESHOLD. TAKING IMAGE")
             self.capture_image()
 
