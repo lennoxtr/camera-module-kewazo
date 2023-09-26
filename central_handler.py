@@ -46,8 +46,8 @@ class CentralHandler:
                 break
     
     def start(self):
-        process_uploading_images = Process(target=self.send_image_to_dashboard())
-        process_handling_can_messages = Process(target=self.handle_can_message())
+        process_uploading_images = Process(target=self.send_image_to_dashboard)
+        process_handling_can_messages = Process(target=self.handle_can_message)
 
         process_uploading_images.start()
         process_handling_can_messages.start()
