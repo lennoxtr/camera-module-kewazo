@@ -20,10 +20,7 @@ class Camera:
         print("CAMERA " + self.camera_address + " INITIALIZED OK")
 
     
-    def capture_image(self):
-        timestamp_folder_name = datetime.datetime.now().strftime("%H%M%S")
-        timestamp_folder_directory = os.path.join(self.main_saving_directory, timestamp_folder_name)
-
+    def capture_image(self, timestamp_folder_directory):
         if (self.camera_object.isOpened()):
             ret, frame = self.camera_object.read()
             if not ret:
@@ -36,8 +33,6 @@ class Camera:
                 except:
                     print("COULD NOT SAVE IMAGE")
 
-    def capture_video(self, time_between_image_frame):
-        return
 
     def close_camera(self):
         self.camera_object.release()
@@ -52,6 +47,7 @@ class CameraHandler:
         self.rm_speed_threshold = rm_speed_threshold
         self.main_saving_directory = self.set_saving_directory()
         self.last_speed_registered = 0
+        self.latest_image_folder = []
 
         camera_id = 0
         for camera_address in camera_address_list:
@@ -81,28 +77,27 @@ class CameraHandler:
         else:
             print("RM SPEED DIFFERENCE GREATER THAN THRESHOLD. TAKING IMAGE")
             self.capture_image()
-            
+
         self.last_speed_registered = rm_speed
 
     def capture_image(self):
+        timestamp_folder_name = datetime.datetime.now().strftime("%H%M%S")
+        timestamp_folder_directory = os.path.join(self.main_saving_directory, timestamp_folder_name)
+        os.mkdir(timestamp_folder_directory)
+
         process_list = []
         for camera_object in self.camera_object_list:
-            process_capture_image = Process(target=camera_object.capture_image())
+            process_capture_image = Process(target=camera_object.capture_image, args=(timestamp_folder_directory,))
             process_capture_image.start()
             process_list.append(process_capture_image)
 
         for process_capture_image in process_list:
             process_capture_image.join()
+        
+        self.latest_image_folder = [timestamp_folder_directory]
 
-    def capture_video(self, time_between_image_frame):
-        process_list = []
-        for camera_object in self.camera_object_list:
-            process_capture_video = Process(target=camera_object.capture_video(time_between_image_frame))
-            process_capture_video.start()
-            process_list.append(process_capture_video)
-
-        for process_capture_video in process_list:
-            process_capture_video.join()
+    def get_latest_image_folder(self):
+        return self.latest_image_folder
 
     def close_camera(self):
         for camera_object in self.camera_object_list:

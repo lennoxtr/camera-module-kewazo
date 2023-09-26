@@ -1,7 +1,7 @@
 from can_bus_handler import CanBusHandler
 from camera_handler import CameraHandler
 from dashboard_handler import DashboardHandler
-from multiprocessing import Process
+from multiprocessing import Process, SimpleQueue
     
 class CentralHandler:
     IMAGES_TOP_LEVEL_DIRECTORY = "./images"
@@ -23,13 +23,14 @@ class CentralHandler:
                                             camera_address_list=camera_address_list,
                                             camera_position_mapping=camera_position_mapping)
 
-    def send_image_to_dashboard(self):
+    def send_image_to_dashboard(self, job_queue):
         while self.dashboard_handler.check_dashboard_connection() == True:
-            self.dashboard_handler.send_image_to_dashboard()
+            latest_image_folder = job_queue.get(0)
+            self.dashboard_handler.send_image_to_dashboard(latest_image_folder)
         else:
             print("SAVING IMAGES LOCALLY ONLY")
     
-    def handle_can_message(self):
+    def handle_can_message(self, job_queue):
         while True:
             try:
                 msg = self.can_handler.recv()
@@ -37,14 +38,19 @@ class CentralHandler:
                 print(msg)
                 rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little')
                 self.camera_handler.do_something(rm_speed)
+                latest_image_folder = self.camera_handler.get_latest_image_folder().pop(0)
+                job_queue.put(latest_image_folder)
+
             except KeyboardInterrupt:
                 self.camera_handler.close_camera()
                 CanBusHandler.can_down()
                 break
     
     def start(self):
-        process_uploading_images = Process(target=self.send_image_to_dashboard)
-        process_handling_can_messages = Process(target=self.handle_can_message)
+        job_queue = SimpleQueue()
+
+        process_uploading_images = Process(target=self.send_image_to_dashboard, args=(job_queue,))
+        process_handling_can_messages = Process(target=self.handle_can_message, args=(job_queue,))
 
         process_uploading_images.start()
         process_handling_can_messages.start()
