@@ -28,6 +28,7 @@ class Camera:
                 while not ret:
                     ret, frame = self.camera_object.read()
                     time.sleep(1)
+                    print("TRYING")
 
 
             print(timestamp_folder_directory)
