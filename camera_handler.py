@@ -2,11 +2,12 @@ import cv2
 import datetime
 from multiprocessing import Process
 import os
+import time
 
 class Camera:
     CAMERA_FRAME_WIDTH = 2560
     CAMERA_FRAME_HEIGHT = 1440
-    IMAGE_NAMING = "{liftbot_id}_{camera_name}"
+    IMAGE_NAMING = "{liftbot_id}_{camera_name}.jpg"
 
     def __init__(self, liftbot_id, camera_name, camera_address, main_saving_directory):
         self.liftbot_id = liftbot_id
@@ -26,7 +27,9 @@ class Camera:
             if not ret:
                 print("CANNOT OPEN " + self.camera_name)
             else:
+                print(timestamp_folder_directory)
                 image_file_directory = os.path.join(timestamp_folder_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name))
+                print(image_file_directory)
                 try:
                     cv2.imwrite(image_file_directory, frame)
                     print(self.camera_name + ' CAPTURED')
@@ -72,7 +75,7 @@ class CameraHandler:
         print("Current RM speed received is: " + str(rm_speed))
         speed_diff = abs(rm_speed - self.last_speed_registered)
 
-        if (speed_diff < self.rm_speed_threshold):
+        if (speed_diff < self.rm_speed_threshold or rm_speed > 300000):
             print("NO ACTION")
         else:
             print("RM SPEED DIFFERENCE GREATER THAN THRESHOLD. TAKING IMAGE")
@@ -84,7 +87,7 @@ class CameraHandler:
         timestamp_folder_name = datetime.datetime.now().strftime("%H%M%S")
         timestamp_folder_directory = os.path.join(self.main_saving_directory, timestamp_folder_name)
         os.mkdir(timestamp_folder_directory)
-
+        time.sleep(3)
         process_list = []
         for camera_object in self.camera_object_list:
             process_capture_image = Process(target=camera_object.capture_image, args=(timestamp_folder_directory,))

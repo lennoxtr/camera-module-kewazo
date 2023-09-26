@@ -34,12 +34,12 @@ class CentralHandler:
         while True:
             try:
                 msg = self.can_handler.recv()
-                rm_speed_as_bytes = msg[-4:]
-                print(msg)
+                rm_speed_as_bytes = msg.data[-4:]
                 rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little')
                 self.camera_handler.do_something(rm_speed)
-                latest_image_folder = self.camera_handler.get_latest_image_folder().pop(0)
-                job_queue.put(latest_image_folder)
+                
+                #latest_image_folder = self.camera_handler.get_latest_image_folder().pop(0)
+                #job_queue.put(latest_image_folder)
 
             except KeyboardInterrupt:
                 self.camera_handler.close_camera()
@@ -49,13 +49,13 @@ class CentralHandler:
     def start(self):
         job_queue = SimpleQueue()
 
-        process_uploading_images = Process(target=self.send_image_to_dashboard, args=(job_queue,))
+        #process_uploading_images = Process(target=self.send_image_to_dashboard, args=(job_queue,))
         process_handling_can_messages = Process(target=self.handle_can_message, args=(job_queue,))
 
-        process_uploading_images.start()
+        #process_uploading_images.start()
         process_handling_can_messages.start()
 
-        process_uploading_images.join()
+        #process_uploading_images.join()
         process_handling_can_messages.join()
 
 if __name__ == "__main__":
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     dashboard_storage_directory = "/home/hakan/images"
     camera_address_list = ['/dev/video0', '/dev/video2'] # maximum is 4
     camera_position_mapping = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
-    rm_speed_threshold = 100 ### Speed threshold is +- 10
+    rm_speed_threshold = 10000 ### Speed threshold is +- 10
     can_id_list_to_listen = [0x3A0]
 
     central_handler = CentralHandler(liftbot_id=liftbot_id,
