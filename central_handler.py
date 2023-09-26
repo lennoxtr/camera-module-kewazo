@@ -4,7 +4,6 @@ from dashboard_handler import DashboardHandler
 from multiprocessing import Process
     
 class CentralHandler:
-    MESSAGE_TIMEOUT = 10.0
     IMAGES_TOP_LEVEL_DIRECTORY = "./images"
 
     def __init__(self,liftbot_id, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
@@ -28,18 +27,16 @@ class CentralHandler:
         while self.dashboard_handler.check_dashboard_connection() == True:
             self.dashboard_handler.send_image_to_dashboard()
         else:
-            print("SAVING IMAGES LOCALLY ONLY")  
+            print("SAVING IMAGES LOCALLY ONLY")
     
     def handle_can_message(self):
         while True:
             try:
-                msg = self.can_handler.recv(self.MESSAGE_TIMEOUT)
-                if msg is None:
-                    print("Timeout occured. No message")
-                else:
-                    print(msg)
-                    rm_speed = int.from_bytes(msg.data, byteorder='little')
-                    self.camera_handler.do_something(rm_speed)
+                msg = self.can_handler.recv()
+                print(msg)
+                ### TODO: Modify this for CANOpen
+                rm_speed = int.from_bytes(msg.data, byteorder='little')
+                self.camera_handler.do_something(rm_speed)
             except KeyboardInterrupt:
                 self.camera_handler.close_camera()
                 CanBusHandler.can_down()
@@ -64,7 +61,7 @@ if __name__ == "__main__":
     dashboard_storage_directory = "/home/hakan/images"
     camera_address_list = ['/dev/video0', '/dev/video2'] # maximum is 4
     camera_position_mapping = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
-    rm_speed_threshold = 10
+    rm_speed_threshold = 100 ### Speed threshold is +- 10
     can_id_list_to_listen = [0x3A0]
 
     central_handler = CentralHandler(liftbot_id=liftbot_id,

@@ -51,6 +51,7 @@ class CameraHandler:
         self.images_top_level_directory = images_top_level_directory
         self.rm_speed_threshold = rm_speed_threshold
         self.main_saving_directory = self.set_saving_directory()
+        self.last_speed_registered = 0
 
         camera_id = 0
         for camera_address in camera_address_list:
@@ -73,11 +74,15 @@ class CameraHandler:
 
     def do_something(self, rm_speed):
         print("Current RM speed received is: " + str(rm_speed))
-        if (rm_speed < self.rm_speed_threshold):
-            print("RM NOT MOVING. NO ACTION")
+        speed_diff = abs(rm_speed - self.last_speed_registered)
+
+        if (speed_diff < self.rm_speed_threshold):
+            print("NO ACTION")
         else:
-            print("RM SPEED GREATER THAN THRESHOLD. TAKING IMAGE")
+            print("RM SPEED DIFFERENCE GREATER THAN THRESHOLD. TAKING IMAGE")
             self.capture_image()
+            
+        self.last_speed_registered = rm_speed
 
     def capture_image(self):
         process_list = []
