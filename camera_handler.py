@@ -25,16 +25,19 @@ class Camera:
         if (self.camera_object.isOpened()):
             ret, frame = self.camera_object.read()
             if not ret:
-                print("CANNOT OPEN " + self.camera_name)
-            else:
-                print(timestamp_folder_directory)
-                image_file_directory = os.path.join(timestamp_folder_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name))
-                print(image_file_directory)
-                try:
-                    cv2.imwrite(image_file_directory, frame)
-                    print(self.camera_name + ' CAPTURED')
-                except:
-                    print("COULD NOT SAVE IMAGE")
+                while not ret:
+                    ret, frame = self.camera_object.read()
+                    time.sleep(1)
+
+
+            print(timestamp_folder_directory)
+            image_file_directory = os.path.join(timestamp_folder_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name))
+            print(image_file_directory)
+            try:
+                cv2.imwrite(image_file_directory, frame)
+                print(self.camera_name + ' CAPTURED')
+            except:
+                print("COULD NOT SAVE IMAGE")
 
 
     def close_camera(self):
@@ -72,7 +75,6 @@ class CameraHandler:
         return self.main_saving_directory
 
     def do_something(self, rm_speed):
-        print("Current RM speed received is: " + str(rm_speed))
         speed_diff = abs(rm_speed - self.last_speed_registered)
 
         if (speed_diff > self.rm_speed_threshold and rm_speed < 300000):
