@@ -26,6 +26,8 @@ class Camera:
             ret, frame = self.camera_object.read()
             while not ret:
                 print("CANNOT GET CAMERA FRAME")
+                self.camera_object.release()
+                time.sleep(2)
                 self.camera_object = cv2.VideoCapture(self.camera_address, cv2.CAP_V4L)
                 self.camera_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
                 self.camera_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
