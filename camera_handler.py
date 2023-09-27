@@ -28,7 +28,7 @@ class Camera:
         capturing_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
         capturing_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
         if (capturing_object.isOpened()):
-            ret, frame = self.camera_object.read()
+            ret, frame = capturing_object.read()
             while not ret:
                 print("CANNOT GET CAMERA FRAME")
             image_file_directory = os.path.join(timestamp_folder_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name))
@@ -41,7 +41,6 @@ class Camera:
             capturing_object.release()
 
     def close_camera(self):
-        self.camera_object.release()
         print(self.camera_name + " TURNED OFF")
 
 class CameraHandler:
