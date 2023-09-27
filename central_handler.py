@@ -2,7 +2,7 @@ from can_bus_handler import CanBusHandler
 from camera_handler import CameraHandler
 from dashboard_handler import DashboardHandler
 from multiprocessing import Process, SimpleQueue
-    
+
 class CentralHandler:
     IMAGES_TOP_LEVEL_DIRECTORY = "./images"
 
@@ -35,9 +35,8 @@ class CentralHandler:
             try:
                 msg = self.can_handler.recv()
                 rm_speed_as_bytes = msg.data[-4:]
-                rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little')
+                rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
                 self.camera_handler.do_something(rm_speed)
-                
                 # latest_image_folder = self.camera_handler.get_latest_image_folder().pop(0)
                 # job_queue.put(latest_image_folder)
 
@@ -66,7 +65,7 @@ if __name__ == "__main__":
     dashboard_storage_directory = "/home/hakan/images"
     camera_address_list = ['/dev/video0', '/dev/video2'] # maximum is 4
     camera_position_mapping = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
-    rm_speed_threshold = 100000 # Speed threshold is +- 100000
+    rm_speed_threshold = 1000 # Speed threshold is +- 100000
     can_id_list_to_listen = [0x3A0]
 
     central_handler = CentralHandler(liftbot_id=liftbot_id,

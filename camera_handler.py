@@ -64,25 +64,25 @@ class CameraHandler:
         return self.main_saving_directory
 
     def do_something(self, rm_speed):
-        if rm_speed == 0:
-            self.rm_status = 0
-            return
-
+        
+        print("RM speed is ", rm_speed) 
         speed_diff = abs(rm_speed - self.last_speed_registered)
 
-        if (speed_diff > self.rm_speed_threshold and rm_speed < 300000 and self.rm_status == 0):
+        if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 400000 and self.rm_status == 0):
             print("RM SPEED DIFFERENCE GREATER THAN THRESHOLD. TAKING IMAGE")
             self.capture_image()
             self.rm_status = 1
-
-        self.last_speed_registered = rm_speed
-
+        
+        if abs(rm_speed) < 400000 and abs(rm_speed) > 400:
+            self.last_speed_registered = rm_speed
+        else:
+            self.rm_status = 0
+            self.last_speed_registered = 0
     def capture_image(self):
         timestamp_folder_name = datetime.datetime.now().strftime("%H%M%S")
         timestamp_folder_directory = os.path.join(self.main_saving_directory, timestamp_folder_name)
         os.mkdir(timestamp_folder_directory)
         self.latest_image_folder = timestamp_folder_directory
-        time.sleep(2)
 
         process_list = []
         for camera_object in self.camera_object_list:
