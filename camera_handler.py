@@ -24,9 +24,12 @@ class Camera:
     def capture_image(self, timestamp_folder_directory):
         if (self.camera_object.isOpened()):
             ret, frame = self.camera_object.read()
-            if not ret:
+            while not ret:
                 print("CANNOT GET CAMERA FRAME")
-            print(timestamp_folder_directory)
+                self.camera_object = cv2.VideoCapture(self.camera_address, cv2.CAP_V4L)
+                self.camera_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
+                self.camera_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
+                ret, frame = self.camera_object.read()
             image_file_directory = os.path.join(timestamp_folder_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name))
             print(image_file_directory)
             try:
@@ -34,12 +37,6 @@ class Camera:
                 print(self.camera_name + ' CAPTURED')
             except:
                 print("COULD NOT SAVE IMAGE")
-
-    @staticmethod
-    def capture_image_helper(self, image_capturing_params):
-        camera_object = image_capturing_params[0]
-        latest_image_folder = image_capturing_params[1]
-        camera_object.capture_image(latest_image_folder)
 
     def close_camera(self):
         self.camera_object.release()
@@ -91,9 +88,15 @@ class CameraHandler:
         self.latest_image_folder = timestamp_folder_directory
         time.sleep(2)
 
-        with Pool() as p:
-            results = p.map(Camera.capture_image_helper, [(camera_object, timestamp_folder_directory) for camera_object in self.camera_object_list])
+        process_list = []
+        for camera_object in self.camera_object_list:
+            process_capturing_image = Process(target=camera_object.capture_image, args=(timestamp_folder_directory,))
+            process_capturing_image.start()
+            process_list.append(process_capturing_image)
         
+        for process in process_list:
+            process.join()
+
     def get_latest_image_folder(self):
         return self.latest_image_folder
 
