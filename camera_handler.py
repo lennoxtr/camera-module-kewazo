@@ -14,24 +14,23 @@ class Camera:
         self.camera_name = camera_name
         self.camera_address = camera_address
         self.main_saving_directory = main_saving_directory
+        '''
         self.camera_object = cv2.VideoCapture(camera_address, cv2.CAP_V4L)
         print("CAMERA " + self.camera_address + " ADDED OK")
         self.camera_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
         self.camera_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
         print("CAMERA " + self.camera_address + " INITIALIZED OK")
+        '''
 
 
     def capture_image(self, timestamp_folder_directory):
-        if (self.camera_object.isOpened()):
+        capturing_object = cv2.VideoCapture(self.camera_address, cv2.CAP_V4L)
+        capturing_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
+        capturing_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
+        if (capturing_object.isOpened()):
             ret, frame = self.camera_object.read()
             while not ret:
                 print("CANNOT GET CAMERA FRAME")
-                self.camera_object.release()
-                time.sleep(2)
-                self.camera_object = cv2.VideoCapture(self.camera_address, cv2.CAP_V4L)
-                self.camera_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
-                self.camera_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
-                ret, frame = self.camera_object.read()
             image_file_directory = os.path.join(timestamp_folder_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name))
             print(image_file_directory)
             try:
@@ -39,6 +38,7 @@ class Camera:
                 print(self.camera_name + ' CAPTURED')
             except:
                 print("COULD NOT SAVE IMAGE")
+            capturing_object.release()
 
     def close_camera(self):
         self.camera_object.release()
