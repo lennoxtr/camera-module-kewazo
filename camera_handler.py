@@ -1,6 +1,6 @@
 import cv2
 import datetime
-from multiprocessing import Process
+from multiprocessing import Process, Pool
 import os
 import time
 
@@ -88,15 +88,10 @@ class CameraHandler:
         timestamp_folder_name = datetime.datetime.now().strftime("%H%M%S")
         timestamp_folder_directory = os.path.join(self.main_saving_directory, timestamp_folder_name)
         os.mkdir(timestamp_folder_directory)
-        time.sleep(3)
-        process_list = []
-        for camera_object in self.camera_object_list:
-            process_capture_image = Process(target=camera_object.capture_image, args=(timestamp_folder_directory,))
-            process_capture_image.start()
-            process_list.append(process_capture_image)
+        time.sleep(2)
 
-        for process_capture_image in process_list:
-            process_capture_image.join()
+        with Pool() as p:
+            results = p.map(lambda x: x.capture_image, self.camera_object_list)
         
         self.latest_image_folder = [timestamp_folder_directory]
 

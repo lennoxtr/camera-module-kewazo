@@ -32,31 +32,29 @@ class DashboardHandler:
     
     def get_unsend_image_folders(self):
         scandir_object = os.scandir(self.images_top_level_directory)
-
         images_folder_list = []
         for entry in scandir_object:
             if (entry.is_dir()):
                 images_folder_list.append(entry.name)
-        
         return images_folder_list
-    
+
     def contain_unsend_image_folder(self):
         return len(self.unsend_image_folder) > 0
 
-
     def send_image_to_dashboard(self, latest_image_folder):
-        ### TODO: Implement checking whether a part of the folder already existed on dashboard
-        while self.contain_unsend_image_folder(): 
+        # TODO: Implement checking whether a part of the folder already existed on dashboard
+        while self.contain_unsend_image_folder():
             print("UPLOADING OLD FOLDER")
             images_folder_name = self.unsend_image_folder.pop(0)
             images_folder_directory = os.path.join(self.images_top_level_directory, images_folder_name)
             try:
-                os.system(self.SEND_TO_DASHBOARD_COMMAND.format(ssh_pass_file_name=self.ssh_pass_file_name,
-                                                                connection_port=self.connection_port,
-                                                                images_folder_directory=images_folder_directory,
-                                                                dashboard_host_name=self.dashboard_host_name,
-                                                                dashboard_host_ip=self.dashboard_host_ip,
-                                                                dashboard_storage_directory=self.dashboard_storage_directory))
+                os.system(self.SEND_TO_DASHBOARD_COMMAND.format(
+                    ssh_pass_file_name=self.ssh_pass_file_name,
+                    connection_port=self.connection_port,
+                    images_folder_directory=images_folder_directory,
+                    dashboard_host_name=self.dashboard_host_name,
+                    dashboard_host_ip=self.dashboard_host_ip,
+                    dashboard_storage_directory=self.dashboard_storage_directory))
                 shutil.rmtree(images_folder_directory)
             except:
                 self.is_connected_to_dashboard = False
@@ -67,14 +65,3 @@ class DashboardHandler:
         except:
             self.is_connected_to_dashboard = False
             print("COULD NOT REACH DASHBOARD")
-
-            
-        
-
-
-
-        
-
-        
-        
-
