@@ -20,7 +20,7 @@ class Camera:
         self.camera_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
         print("CAMERA " + self.camera_address + " INITIALIZED OK")
 
-    
+
     def capture_image(self, timestamp_folder_directory):
         if (self.camera_object.isOpened()):
             ret, frame = self.camera_object.read()
