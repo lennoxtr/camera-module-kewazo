@@ -25,12 +25,7 @@ class Camera:
         if (self.camera_object.isOpened()):
             ret, frame = self.camera_object.read()
             if not ret:
-                while not ret:
-                    ret, frame = self.camera_object.read()
-                    time.sleep(1)
-                    print("TRYING")
-
-
+                print("CANNOT GET CAMERA FRAME")
             print(timestamp_folder_directory)
             image_file_directory = os.path.join(timestamp_folder_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name))
             print(image_file_directory)
