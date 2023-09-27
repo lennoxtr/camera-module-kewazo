@@ -1,6 +1,6 @@
 import cv2
 import datetime
-from multiprocessing import Process, Pool
+from multiprocessing import Process
 import os
 import time
 
@@ -14,14 +14,6 @@ class Camera:
         self.camera_name = camera_name
         self.camera_address = camera_address
         self.main_saving_directory = main_saving_directory
-        '''
-        self.camera_object = cv2.VideoCapture(camera_address, cv2.CAP_V4L)
-        print("CAMERA " + self.camera_address + " ADDED OK")
-        self.camera_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
-        self.camera_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
-        print("CAMERA " + self.camera_address + " INITIALIZED OK")
-        '''
-
 
     def capture_image(self, timestamp_folder_directory):
         capturing_object = cv2.VideoCapture(self.camera_address, cv2.CAP_V4L)
@@ -40,9 +32,6 @@ class Camera:
                 print("COULD NOT SAVE IMAGE")
             capturing_object.release()
 
-    def close_camera(self):
-        print(self.camera_name + " TURNED OFF")
-
 class CameraHandler:
     camera_object_list = []
 
@@ -52,7 +41,8 @@ class CameraHandler:
         self.rm_speed_threshold = rm_speed_threshold
         self.main_saving_directory = self.set_saving_directory()
         self.last_speed_registered = 0
-        self.latest_image_folder = []
+        self.latest_image_folder = ""
+        self.rm_status = 0
 
         camera_id = 0
         for camera_address in camera_address_list:
@@ -74,11 +64,16 @@ class CameraHandler:
         return self.main_saving_directory
 
     def do_something(self, rm_speed):
+        if rm_speed == 0:
+            self.rm_status = 0
+            return
+
         speed_diff = abs(rm_speed - self.last_speed_registered)
 
-        if (speed_diff > self.rm_speed_threshold and rm_speed < 300000):
+        if (speed_diff > self.rm_speed_threshold and rm_speed < 300000 and self.rm_status == 0):
             print("RM SPEED DIFFERENCE GREATER THAN THRESHOLD. TAKING IMAGE")
             self.capture_image()
+            self.rm_status = 1
 
         self.last_speed_registered = rm_speed
 
@@ -101,9 +96,6 @@ class CameraHandler:
     def get_latest_image_folder(self):
         return self.latest_image_folder
 
-    def close_camera(self):
-        for camera_object in self.camera_object_list:
-            camera_object.close_camera()
 
 
 

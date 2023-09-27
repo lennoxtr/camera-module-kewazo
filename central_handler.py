@@ -42,7 +42,6 @@ class CentralHandler:
                 # job_queue.put(latest_image_folder)
 
             except KeyboardInterrupt:
-                self.camera_handler.close_camera()
                 CanBusHandler.can_down()
                 break
     
