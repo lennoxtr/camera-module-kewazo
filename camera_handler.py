@@ -35,6 +35,11 @@ class Camera:
             except:
                 print("COULD NOT SAVE IMAGE")
 
+    @staticmethod
+    def capture_image_helper(self, image_capturing_params):
+        camera_object = image_capturing_params[0]
+        latest_image_folder = image_capturing_params[1]
+        camera_object.capture_image(latest_image_folder)
 
     def close_camera(self):
         self.camera_object.release()
@@ -83,13 +88,12 @@ class CameraHandler:
         timestamp_folder_name = datetime.datetime.now().strftime("%H%M%S")
         timestamp_folder_directory = os.path.join(self.main_saving_directory, timestamp_folder_name)
         os.mkdir(timestamp_folder_directory)
+        self.latest_image_folder = timestamp_folder_directory
         time.sleep(2)
 
         with Pool() as p:
-            results = p.map(lambda x: x.capture_image, self.camera_object_list)
+            results = p.map(Camera.capture_image_helper, [(camera_object, timestamp_folder_directory) for camera_object in self.camera_object_list])
         
-        self.latest_image_folder = [timestamp_folder_directory]
-
     def get_latest_image_folder(self):
         return self.latest_image_folder
 
