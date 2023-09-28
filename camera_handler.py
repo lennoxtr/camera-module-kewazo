@@ -2,28 +2,27 @@ import cv2
 import datetime
 from multiprocessing import Process
 import os
-import time
 
 class Camera:
     CAMERA_FRAME_WIDTH = 2560
     CAMERA_FRAME_HEIGHT = 1440
-    IMAGE_NAMING = "{liftbot_id}_{camera_name}.jpg"
+    IMAGE_NAMING = "{liftbot_id}_{camera_name}_{date}_{timestamp}.jpg"
 
-    def __init__(self, liftbot_id, camera_name, camera_address, main_saving_directory):
+    def __init__(self, liftbot_id, camera_name, camera_address, date_specific_saving_directory):
         self.liftbot_id = liftbot_id
         self.camera_name = camera_name
         self.camera_address = camera_address
-        self.main_saving_directory = main_saving_directory
+        self.date_specific_saving_directory = date_specific_saving_directory
 
-    def capture_image(self, timestamp_folder_directory):
+    def capture_image(self, date_specific_saving_directory, date, timestamp):
         capturing_object = cv2.VideoCapture(self.camera_address, cv2.CAP_V4L)
         capturing_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
         capturing_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
         if (capturing_object.isOpened()):
             ret, frame = capturing_object.read()
-            while not ret:
+            if not ret:
                 print("CANNOT GET CAMERA FRAME")
-            image_file_directory = os.path.join(timestamp_folder_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name))
+            image_file_directory = os.path.join(date_specific_saving_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name, date=date, timestamp=timestamp))
             print(image_file_directory)
             try:
                 cv2.imwrite(image_file_directory, frame)
@@ -39,9 +38,8 @@ class CameraHandler:
         self.liftbot_id = liftbot_id
         self.images_top_level_directory = images_top_level_directory
         self.rm_speed_threshold = rm_speed_threshold
-        self.main_saving_directory = self.set_saving_directory()
+        self.date_specific_saving_directory = ""
         self.last_speed_registered = 0
-        self.latest_image_folder = ""
         self.rm_status = 0
 
         camera_id = 0
@@ -49,19 +47,18 @@ class CameraHandler:
             camera_object = Camera(liftbot_id=liftbot_id,
                                    camera_name= camera_position_mapping[camera_id], 
                                    camera_address=camera_address,
-                                   main_saving_directory=self.main_saving_directory)
+                                   date_specific_saving_directory=self.date_specific_saving_directory)
             self.camera_object_list.append(camera_object)
             camera_id += 1
     
-    def set_saving_directory(self):
-        timestamp_saving_folder = datetime.date.today().strftime("%y-%m-%d")
-        main_saving_directory = os.path.join(self.images_top_level_directory, timestamp_saving_folder)
-        if not os.path.exists(main_saving_directory):
-            os.makedirs(main_saving_directory)
-        return main_saving_directory
+    def set_date_specific_saving_directory(self, date):
+        date_specific_saving_directory = os.path.join(self.images_top_level_directory, date)
+        if not os.path.exists(date_specific_saving_directory):
+            os.makedirs(date_specific_saving_directory)
+        return date_specific_saving_directory
     
-    def get_saving_directory(self):
-        return self.main_saving_directory
+    def get_date_specific_saving_directory(self):
+        return self.date_specific_saving_directory
 
     def do_something(self, rm_speed):
         
@@ -78,24 +75,17 @@ class CameraHandler:
         else:
             self.rm_status = 0
             self.last_speed_registered = 0
+
     def capture_image(self):
-        timestamp_folder_name = datetime.datetime.now().strftime("%H%M%S")
-        timestamp_folder_directory = os.path.join(self.main_saving_directory, timestamp_folder_name)
-        os.mkdir(timestamp_folder_directory)
-        self.latest_image_folder = timestamp_folder_directory
+        date = datetime.date.today().strftime("%y%m%d")
+        timestamp = datetime.datetime.now().strftime("%H%M%S")
+        self.date_specific_saving_directory = self.set_date_specific_saving_directory(date=date)
 
         process_list = []
         for camera_object in self.camera_object_list:
-            process_capturing_image = Process(target=camera_object.capture_image, args=(timestamp_folder_directory,))
+            process_capturing_image = Process(target=camera_object.capture_image, args=(self.date_specific_saving_directory, date, timestamp))
             process_capturing_image.start()
             process_list.append(process_capturing_image)
         
         for process in process_list:
             process.join()
-
-    def get_latest_image_folder(self):
-        return self.latest_image_folder
-
-
-
-

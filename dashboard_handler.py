@@ -3,7 +3,7 @@ import shutil
 
 class DashboardHandler:
     MESSAGE_TIMEOUT = 10.0
-    PING_DASHBOARD_COMMAND = 'ping -c 1 {dashboard_host_ip}'
+    PING_DASHBOARD_COMMAND = 'ping -c 1 -W 2 {dashboard_host_ip}'
     SEND_TO_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} scp -P {connection_port} -o StrictHostKeyChecking=no -pr {images_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_storage_directory}"
     CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = ""
 
