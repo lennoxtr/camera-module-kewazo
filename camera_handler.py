@@ -60,7 +60,7 @@ class CameraHandler:
     def get_date_specific_saving_directory(self):
         return self.date_specific_saving_directory
 
-    def do_something(self, rm_speed):
+    def execute(self, rm_speed):
         
         print("RM speed is ", rm_speed) 
         speed_diff = abs(rm_speed - self.last_speed_registered)

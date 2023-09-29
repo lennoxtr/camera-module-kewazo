@@ -36,7 +36,7 @@ class CentralHandler:
                 msg = self.can_handler.recv()
                 rm_speed_as_bytes = msg.data[-4:]
                 rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
-                self.camera_handler.do_something(rm_speed)
+                self.camera_handler.execute(rm_speed)
                 # latest_image_folder = self.camera_handler.get_latest_image_folder().pop(0)
                 # job_queue.put(latest_image_folder)
 
