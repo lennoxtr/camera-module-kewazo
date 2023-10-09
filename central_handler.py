@@ -24,7 +24,7 @@ class CentralHandler:
                                             camera_position_mapping=camera_position_mapping)
 
     def send_image_to_dashboard(self, job_queue):
-        while self.dashboard_handler.check_dashboard_connection() is True:
+        while self.dashboard_handler.is_connected_to_dashboard:
             latest_image_folder = job_queue.get(0)
             self.dashboard_handler.send_image_to_dashboard(latest_image_folder)
         else:
@@ -58,9 +58,9 @@ if __name__ == "__main__":
     liftbot_id = "LB1"
     ssh_pass_file_name = "ssh_pass"
     connection_port = "18538"
-    dashboard_host_name = "hakan"
+    dashboard_host_name = "khang"
     dashboard_host_ip = "7.tcp.eu.ngrok.io"
-    dashboard_images_saving_directory = "/home/hakan/images"
+    dashboard_images_saving_directory = "/mnt/HC_Volume_11785377/images/"
     camera_address_list = ['/dev/video0', '/dev/video2'] # maximum is 4
     camera_position_mapping = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
     rm_speed_threshold = 1000 # Speed threshold is +- 100000
