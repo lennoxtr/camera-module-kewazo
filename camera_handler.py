@@ -22,8 +22,9 @@ class Camera:
             ret, frame = capturing_object.read()
             if not ret:
                 print("CANNOT GET CAMERA FRAME")
-            image_file_directory = os.path.join(date_specific_saving_directory, self.IMAGE_NAMING.format(liftbot_id=self.liftbot_id, camera_name=self.camera_name, date=date, timestamp=timestamp))
-            print(image_file_directory)
+            image_file_directory = os.path.join(date_specific_saving_directory, self.IMAGE_NAMING.format(
+                liftbot_id=self.liftbot_id, camera_name=self.camera_name, date=date, timestamp=timestamp))
+
             try:
                 cv2.imwrite(image_file_directory, frame)
                 print(self.camera_name + ' CAPTURED')
@@ -34,9 +35,9 @@ class Camera:
 class CameraHandler:
     camera_object_list = []
 
-    def __init__(self, liftbot_id, images_top_level_directory, rm_speed_threshold, camera_address_list, camera_position_mapping):
+    def __init__(self, liftbot_id, local_images_saving_directory, rm_speed_threshold, camera_address_list, camera_position_mapping):
         self.liftbot_id = liftbot_id
-        self.images_top_level_directory = images_top_level_directory
+        self.local_images_saving_directory = local_images_saving_directory
         self.rm_speed_threshold = rm_speed_threshold
         self.date_specific_saving_directory = ""
         self.last_speed_registered = 0
@@ -52,7 +53,7 @@ class CameraHandler:
             camera_id += 1
     
     def set_date_specific_saving_directory(self, date):
-        date_specific_saving_directory = os.path.join(self.images_top_level_directory, date)
+        date_specific_saving_directory = os.path.join(self.local_images_saving_directory, date)
         if not os.path.exists(date_specific_saving_directory):
             os.makedirs(date_specific_saving_directory)
         return date_specific_saving_directory

@@ -4,10 +4,10 @@ from dashboard_handler import DashboardHandler
 from multiprocessing import Process, SimpleQueue
 
 class CentralHandler:
-    IMAGES_TOP_LEVEL_DIRECTORY = "./images"
+    LOCAL_IMAGES_SAVING_DIRECTORY = "./images"
 
     def __init__(self,liftbot_id, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
-                 dashboard_storage_directory, rm_speed_threshold, camera_address_list, camera_position_mapping, can_id_list_to_listen):
+                 dashboard_images_saving_directory, rm_speed_threshold, camera_address_list, camera_position_mapping, can_id_list_to_listen):
         
         self.liftbot_id = liftbot_id
         self.can_handler = CanBusHandler.setup_can(can_id_list_to_listen=can_id_list_to_listen)
@@ -15,10 +15,10 @@ class CentralHandler:
                                                   connection_port=connection_port,
                                                   dashboard_host_name=dashboard_host_name,
                                                   dashboard_host_ip=dashboard_host_ip,
-                                                  dashboard_storage_directory=dashboard_storage_directory, 
-                                                  images_top_level_directory=self.IMAGES_TOP_LEVEL_DIRECTORY)
+                                                  dashboard_images_saving_directory=dashboard_images_saving_directory, 
+                                                  local_images_saving_directory=self.LOCAL_IMAGES_SAVING_DIRECTORY)
         self.camera_handler = CameraHandler(liftbot_id=liftbot_id,
-                                            images_top_level_directory=self.IMAGES_TOP_LEVEL_DIRECTORY,
+                                            local_images_saving_directory=self.LOCAL_IMAGES_SAVING_DIRECTORY,
                                             rm_speed_threshold=rm_speed_threshold,
                                             camera_address_list=camera_address_list,
                                             camera_position_mapping=camera_position_mapping)
@@ -30,15 +30,13 @@ class CentralHandler:
         else:
             print("SAVING IMAGES LOCALLY ONLY")
     
-    def handle_can_message(self, job_queue):
+    def handle_can_message(self):
         while True:
             try:
                 msg = self.can_handler.recv()
                 rm_speed_as_bytes = msg.data[-4:]
                 rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
                 self.camera_handler.execute(rm_speed)
-                # latest_image_folder = self.camera_handler.get_latest_image_folder().pop(0)
-                # job_queue.put(latest_image_folder)
 
             except KeyboardInterrupt:
                 CanBusHandler.can_down()
@@ -62,7 +60,7 @@ if __name__ == "__main__":
     connection_port = "18538"
     dashboard_host_name = "hakan"
     dashboard_host_ip = "7.tcp.eu.ngrok.io"
-    dashboard_storage_directory = "/home/hakan/images"
+    dashboard_images_saving_directory = "/home/hakan/images"
     camera_address_list = ['/dev/video0', '/dev/video2'] # maximum is 4
     camera_position_mapping = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
     rm_speed_threshold = 1000 # Speed threshold is +- 100000
@@ -73,7 +71,7 @@ if __name__ == "__main__":
                                      connection_port=connection_port,
                                      dashboard_host_name=dashboard_host_name,
                                      dashboard_host_ip=dashboard_host_ip,
-                                     dashboard_storage_directory=dashboard_storage_directory,
+                                     dashboard_images_saving_directory=dashboard_images_saving_directory,
                                      rm_speed_threshold=rm_speed_threshold,
                                      camera_address_list=camera_address_list,
                                      camera_position_mapping=camera_position_mapping,
