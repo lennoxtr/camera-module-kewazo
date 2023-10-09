@@ -8,13 +8,12 @@ class Camera:
     CAMERA_FRAME_HEIGHT = 1440
     IMAGE_NAMING = "{liftbot_id}_{camera_name}_{date}_{timestamp}.jpg"
 
-    def __init__(self, liftbot_id, camera_name, camera_address, date_specific_saving_directory):
+    def __init__(self, liftbot_id, camera_name, camera_address):
         self.liftbot_id = liftbot_id
         self.camera_name = camera_name
         self.camera_address = camera_address
-        self.date_specific_saving_directory = date_specific_saving_directory
 
-    def capture_image(self, date_specific_saving_directory, date, timestamp):
+    def capture_image(self, timestamp_saving_directory, date, timestamp):
         capturing_object = cv2.VideoCapture(self.camera_address, cv2.CAP_V4L)
         capturing_object.set(cv2.CAP_PROP_FRAME_WIDTH, self.CAMERA_FRAME_WIDTH)
         capturing_object.set(cv2.CAP_PROP_FRAME_HEIGHT, self.CAMERA_FRAME_HEIGHT)
@@ -22,11 +21,11 @@ class Camera:
             ret, frame = capturing_object.read()
             if not ret:
                 print("CANNOT GET CAMERA FRAME")
-            image_file_directory = os.path.join(date_specific_saving_directory, self.IMAGE_NAMING.format(
+            image_directory = os.path.join(timestamp_saving_directory, self.IMAGE_NAMING.format(
                 liftbot_id=self.liftbot_id, camera_name=self.camera_name, date=date, timestamp=timestamp))
 
             try:
-                cv2.imwrite(image_file_directory, frame)
+                cv2.imwrite(image_directory, frame)
                 print(self.camera_name + ' CAPTURED')
             except:
                 print("COULD NOT SAVE IMAGE")
@@ -39,16 +38,14 @@ class CameraHandler:
         self.liftbot_id = liftbot_id
         self.local_images_saving_directory = local_images_saving_directory
         self.rm_speed_threshold = rm_speed_threshold
-        self.date_specific_saving_directory = ""
         self.last_speed_registered = 0
         self.rm_status = 0
 
         camera_id = 0
         for camera_address in camera_address_list:
             camera_object = Camera(liftbot_id=liftbot_id,
-                                   camera_name= camera_position_mapping[camera_id], 
-                                   camera_address=camera_address,
-                                   date_specific_saving_directory=self.date_specific_saving_directory)
+                                   camera_name=camera_position_mapping[camera_id], 
+                                   camera_address=camera_address)
             self.camera_object_list.append(camera_object)
             camera_id += 1
     
@@ -58,8 +55,11 @@ class CameraHandler:
             os.makedirs(date_specific_saving_directory)
         return date_specific_saving_directory
     
-    def get_date_specific_saving_directory(self):
-        return self.date_specific_saving_directory
+    def set_timestamp_saving_directory(self, date_specific_saving_directory, timestamp):
+        timestamp_saving_directory = os.path.join(date_specific_saving_directory, timestamp)
+        if not os.path.exists(timestamp_saving_directory):
+            os.makedirs(timestamp_saving_directory)
+        return timestamp_saving_directory
 
     def execute(self, rm_speed):
         
@@ -80,11 +80,12 @@ class CameraHandler:
     def capture_image(self):
         date = datetime.date.today().strftime("%y%m%d")
         timestamp = datetime.datetime.now().strftime("%H%M%S")
-        self.date_specific_saving_directory = self.set_date_specific_saving_directory(date=date)
+        date_specific_saving_directory = self.set_date_specific_saving_directory(date=date)
+        timestamp_saving_directory = self.set_timestamp_saving_directory(date_specific_saving_directory=date_specific_saving_directory, timestamp=timestamp)
 
         process_list = []
         for camera_object in self.camera_object_list:
-            process_capturing_image = Process(target=camera_object.capture_image, args=(self.date_specific_saving_directory, date, timestamp))
+            process_capturing_image = Process(target=camera_object.capture_image, args=(timestamp_saving_directory, date, timestamp))
             process_capturing_image.start()
             process_list.append(process_capturing_image)
         
