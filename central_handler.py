@@ -1,7 +1,7 @@
 from can_bus_handler import CanBusHandler
 from camera_handler import CameraHandler
 from dashboard_handler import DashboardHandler
-from multiprocessing import Process, SimpleQueue
+from multiprocessing import Process
 
 class CentralHandler:
     LOCAL_IMAGES_SAVING_DIRECTORY = "./images"
@@ -23,36 +23,33 @@ class CentralHandler:
                                             camera_address_list=camera_address_list,
                                             camera_position_mapping=camera_position_mapping)
 
-    def send_image_to_dashboard(self, job_queue):
+    def send_image_to_dashboard(self):
         while self.dashboard_handler.is_connected_to_dashboard:
-            latest_image_folder = job_queue.get(0)
-            self.dashboard_handler.send_image_to_dashboard(latest_image_folder)
+            self.dashboard_handler.execute()
         else:
             print("SAVING IMAGES LOCALLY ONLY")
     
     def handle_can_message(self):
         while True:
-            try:
-                msg = self.can_handler.recv()
-                rm_speed_as_bytes = msg.data[-4:]
-                rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
-                self.camera_handler.execute(rm_speed)
+            msg = self.can_handler.recv()
+            rm_speed_as_bytes = msg.data[-4:]
+            rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
+            self.camera_handler.execute(rm_speed)
 
-            except KeyboardInterrupt:
-                CanBusHandler.can_down()
-                break
-    
     def start(self):
-        job_queue = SimpleQueue()
+        try:
 
-        # process_uploading_images = Process(target=self.send_image_to_dashboard, args=(job_queue,))
-        process_handling_can_messages = Process(target=self.handle_can_message, args=(job_queue,))
+            process_uploading_images = Process(target=self.send_image_to_dashboard)
+            process_handling_can_messages = Process(target=self.handle_can_message)
 
-        # process_uploading_images.start()
-        process_handling_can_messages.start()
+            process_uploading_images.start()
+            process_handling_can_messages.start()
 
-        # process_uploading_images.join()
-        process_handling_can_messages.join()
+            process_uploading_images.join()
+            process_handling_can_messages.join()
+
+        except KeyboardInterrupt:
+            CanBusHandler.can_down()
 
 if __name__ == "__main__":
     liftbot_id = "LB1"
