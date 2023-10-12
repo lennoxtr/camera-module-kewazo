@@ -24,27 +24,27 @@ class CentralHandler:
                                             camera_position_mapping=camera_position_mapping)
 
     def send_image_to_dashboard(self):
-        while self.dashboard_handler.is_connected_to_dashboard:
+        if self.dashboard_handler.is_connected_to_dashboard:
             self.dashboard_handler.execute()
 
     def handle_can_message(self):
-        while True:
-            msg = self.can_handler.recv()
-            rm_speed_as_bytes = msg.data[-4:]
-            rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
-            self.camera_handler.execute(rm_speed)
+        
+        msg = self.can_handler.recv()
+        rm_speed_as_bytes = msg.data[-4:]
+        rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
+        self.camera_handler.execute(rm_speed)
 
     def start(self):
         try:
+            while True:
+                process_uploading_images = Process(target=self.send_image_to_dashboard)
+                process_handling_can_messages = Process(target=self.handle_can_message)
 
-            process_uploading_images = Process(target=self.send_image_to_dashboard)
-            process_handling_can_messages = Process(target=self.handle_can_message)
+                process_uploading_images.start()
+                process_handling_can_messages.start()
 
-            process_uploading_images.start()
-            process_handling_can_messages.start()
-
-            process_uploading_images.join()
-            process_handling_can_messages.join()
+                process_uploading_images.join()
+                process_handling_can_messages.join()
 
         except KeyboardInterrupt:
             CanBusHandler.can_down()
