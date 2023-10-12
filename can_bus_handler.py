@@ -1,9 +1,39 @@
+"""
+This module allows the Camera Module to receive CAN messages from specified CAN ID
+
+It handles setting up CAN communication to connect  CAN controller to the CAN network.
+It creates a CAN bus object with specified filters which the Camera Module can
+use to receive CAN messages from different CAN IDs to determine whether it should capture images.
+It also disconnects the CAN controller from CAN network when the Camera Module is turned off.
+
+Typical usage example:
+
+    can0 = CanBushandler.setup_can(can_id_list_to_listen)
+    CanBushandler.can_down()
+
+"""
+
 import os
 import can
 
 class CanBusHandler:
+    """
+    Setting up CAN communication and disconnecting from CAN network.
+    """
+
     @staticmethod
     def setup_can(can_id_list_to_listen):
+        """
+        Connect CAN controller to receive messages.
+        Return a CAN object with specified CAN ID filters and masks.
+
+        Args:
+            can_id_list_to_listen (list) : list of CAN ID to filter CAN messages.
+
+        Returns:
+            can.interface.Bus : a CAN object.
+
+        """
         os.system('sudo ip link set can0 type can bitrate 1000000')
         os.system('sudo ifconfig can0 up')
 
@@ -19,4 +49,7 @@ class CanBusHandler:
 
     @staticmethod
     def can_down():
+        """
+        Disconnect CAN controller from the CAN network
+        """
         os.system('sudo ifconfig can0 down')

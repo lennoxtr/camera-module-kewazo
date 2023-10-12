@@ -1,3 +1,7 @@
+"""
+This module allows the Camera 
+"""
+
 import os
 import shutil
 from multiprocessing import Process, Pool
