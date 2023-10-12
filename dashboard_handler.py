@@ -24,9 +24,9 @@ class DashboardHandler:
     def connect_to_dashboard(self):
         response_code = os.system(self.PING_DASHBOARD_COMMAND.format(dashboard_host_ip=self.dashboard_host_ip))
         if response_code == 0:
-            print("CONNECTED TO DASHBOARD")
+            #print("CONNECTED TO DASHBOARD")
             return True
-        print("COULD NOT REACH DASHBOARD")
+        #print("COULD NOT REACH DASHBOARD")
         return False
 
     def get_all_subfolders(self, local_folder_directory):
@@ -69,7 +69,7 @@ class DashboardHandler:
                     shutil.rmtree(subfolder_local_directory)
                 except:
                     self.is_connected_to_dashboard = False
-                    print("COULD NOT REACH DASHBOARD")
+                    #print("COULD NOT REACH DASHBOARD")
                     continue
 
     def send_multiple_folders_to_dashboard(self, local_image_folder_directories_list):

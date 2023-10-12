@@ -27,7 +27,7 @@ class Camera:
 
             try:
                 cv2.imwrite(image_directory, frame)
-                print(self.camera_name + ' CAPTURED')
+                #print(self.camera_name + ' CAPTURED')
             except:
                 print("COULD NOT SAVE IMAGE")
             capturing_object.release()
@@ -59,11 +59,11 @@ class CameraHandler:
 
     def execute(self, rm_speed):
 
-        print("RM speed is ", rm_speed)
+        #print("RM speed is ", rm_speed)
         speed_diff = abs(rm_speed - self.last_speed_registered)
 
         if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 400000 and self.rm_status == 0):
-            print("RM SPEED DIFFERENCE GREATER THAN THRESHOLD. TAKING IMAGE")
+            #print("RM SPEED DIFFERENCE GREATER THAN THRESHOLD. TAKING IMAGE")
             self.capture_image()
             self.rm_status = 1
 

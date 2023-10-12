@@ -28,7 +28,6 @@ class CentralHandler:
         while True:
             if self.dashboard_handler.is_connected_to_dashboard:
                 self.dashboard_handler.execute()
-                time.sleep(1)
 
     def handle_can_message(self):
         while True:
@@ -36,6 +35,7 @@ class CentralHandler:
             rm_speed_as_bytes = msg.data[-4:]
             rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
             self.camera_handler.execute(rm_speed)
+            time.sleep(1)
 
     def start(self):
         try:
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     DASHBOARD_IMAGES_SAVING_DIRECTORY= "/mnt/HC_Volume_11785377/images/"
     CAMERA_ADDRESS_LIST = ['/dev/video0', '/dev/video2'] # maximum is 4
     CAMERA_POSITION_MAPPING = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
-    RM_SPEED_THRESHOLD = 1000 # Speed threshold is +- 100000
+    RM_SPEED_THRESHOLD = 1000 # Speed threshold is +- 10000
     CAN_ID_LIST_TO_LISTEN = [0x3A0]
 
     central_handler = CentralHandler(liftbot_id=LIFTBOT_ID,
