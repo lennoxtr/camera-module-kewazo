@@ -2,6 +2,7 @@ from multiprocessing import Process
 from can_bus_handler import CanBusHandler
 from camera_handler import CameraHandler
 from dashboard_handler import DashboardHandler
+import time
 
 class CentralHandler:
     LOCAL_IMAGES_SAVING_DIRECTORY = "./images"
@@ -27,6 +28,7 @@ class CentralHandler:
         while True:
             if self.dashboard_handler.is_connected_to_dashboard:
                 self.dashboard_handler.execute()
+                time.sleep(1)
 
     def handle_can_message(self):
         while True:
