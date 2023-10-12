@@ -16,7 +16,7 @@ class CanBusHandler:
         can0 = can.interface.Bus(channel=can_channel, bustype=can_bustype, can_filters=can_filters)
         print('CAN SETUP OK')
         return can0
-    
+
     @staticmethod
     def can_down():
         os.system('sudo ifconfig can0 down')

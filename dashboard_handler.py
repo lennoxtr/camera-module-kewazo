@@ -22,26 +22,25 @@ class DashboardHandler:
         if response_code == 0:
             print("CONNECTED TO DASHBOARD")
             return True
-        else:
-            print("COULD NOT REACH DASHBOARD")
-            return False
-    
+        print("COULD NOT REACH DASHBOARD")
+        return False
+
     def get_all_subfolders(self, local_folder_directory):
         scandir_object = os.scandir(local_folder_directory)
         subfolders_list = []
         for entry in scandir_object:
-            if (entry.is_dir()):
+            if entry.is_dir():
                 subfolders_list.append(entry.name)
         return subfolders_list
 
     def send_single_folder_to_dashboard(self, date_specific_folder):
         date_specific_folder_local_directory = os.path.join(self.local_images_saving_directory, date_specific_folder)
-        timestamp_folders_to_send = self.get_all_subfolders(local_folder_directory=date_specific_folder_local_directory)
+        timestamp_folders_to_send = self.get_all_subfolders(date_specific_folder_local_directory)
         if len(timestamp_folders_to_send) == 0:
             shutil.rmtree(date_specific_folder_local_directory)
-        elif self.is_connected_to_dashboard == False:
+        elif self.is_connected_to_dashboard is False:
             pass
-        else:    
+        else:
             try:
                 os.system(self.CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND.format(
                     ssh_pass_file_name=self.ssh_pass_file_name,
@@ -85,7 +84,7 @@ class DashboardHandler:
             if len(unsend_image_folders_list) > 0:
                 process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard(unsend_image_folders_list))
                 process_send_old_images.start()
-            
+
             process_send_live_images.join()
             if len(unsend_image_folders_list) > 0:
                 process_send_old_images.join()

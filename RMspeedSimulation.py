@@ -10,14 +10,10 @@ def setup_can_object():
     return can0
 
 if __name__ == "__main__":
-    can0 = setup_can_object()
+    can_object = setup_can_object()
 
     while True:
         RM_speed =  int(input("RM simulated speed as integer: "))
         msg = can.Message(arbitration_id=0x3A0, data=[RM_speed], is_extended_id=False)
 
-        can0.send(msg)
-    
-
- 
-
+        can_object.send(msg)
