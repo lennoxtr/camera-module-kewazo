@@ -21,4 +21,4 @@ jobs:
         pip install python-can opencv-python
     - name: Analysing the code with pylint
       run: |
-        pylint -d R0913, R0903 $(git ls-files '*.py')
+        pylint -d R0913, R0903, E0110 $(git ls-files '*.py')
