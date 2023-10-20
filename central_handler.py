@@ -9,7 +9,7 @@ class CentralHandler:
 
     def __init__(self,liftbot_id, ssh_pass_file_name, connection_port, dashboard_host_name,
                  dashboard_host_ip, dashboard_images_saving_directory, rm_speed_threshold,
-                 camera_address_list, camera_position_mapping, can_id_list_to_listen):
+                 camera_position_mapping, can_id_list_to_listen):
         self.liftbot_id = liftbot_id
         self.can_handler = CanBusHandler.setup_can(can_id_list_to_listen=can_id_list_to_listen)
         self.dashboard_handler = DashboardHandler(ssh_pass_file_name=ssh_pass_file_name,
@@ -21,7 +21,6 @@ class CentralHandler:
         self.camera_handler = CameraHandler(liftbot_id=liftbot_id,
                                             local_images_saving_directory=self.LOCAL_IMAGES_SAVING_DIRECTORY,
                                             rm_speed_threshold=rm_speed_threshold,
-                                            camera_address_list=camera_address_list,
                                             camera_position_mapping=camera_position_mapping)
 
     def send_image_to_dashboard(self):
@@ -55,7 +54,6 @@ if __name__ == "__main__":
     DASHBOARD_HOST_NAME = "khang"
     DASHBOARD_HOST_IP = "7.tcp.eu.ngrok.io"
     DASHBOARD_IMAGES_SAVING_DIRECTORY= "/mnt/HC_Volume_11785377/images/"
-    CAMERA_ADDRESS_LIST = ['/dev/video0', '/dev/video2'] # maximum is 4
     CAMERA_POSITION_MAPPING = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
     RM_SPEED_THRESHOLD = 1000 # Speed threshold is +- 10000
     CAN_ID_LIST_TO_LISTEN = [0x3A0]
@@ -67,7 +65,6 @@ if __name__ == "__main__":
                                      dashboard_host_ip=DASHBOARD_HOST_IP,
                                      dashboard_images_saving_directory=DASHBOARD_IMAGES_SAVING_DIRECTORY,
                                      rm_speed_threshold=RM_SPEED_THRESHOLD,
-                                     camera_address_list=CAMERA_ADDRESS_LIST,
                                      camera_position_mapping=CAMERA_POSITION_MAPPING,
                                      can_id_list_to_listen=CAN_ID_LIST_TO_LISTEN)
     central_handler.start()
