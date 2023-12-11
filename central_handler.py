@@ -22,6 +22,7 @@ class CentralHandler:
                                             local_images_saving_directory=self.LOCAL_IMAGES_SAVING_DIRECTORY,
                                             rm_speed_threshold=rm_speed_threshold,
                                             camera_position_mapping=camera_position_mapping)
+        print("Central Handler setup OK")
 
     def send_image_to_dashboard(self):
         while True:
@@ -31,17 +32,19 @@ class CentralHandler:
     def handle_can_message(self):
         while True:
             msg = self.can_handler.recv()
+            print(msg)
             rm_speed_as_bytes = msg.data[-4:]
             rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
+            print("Speed received is: ", rm_speed)
             self.camera_handler.execute(rm_speed)
             time.sleep(1)
 
     def start(self):
         try:
-            process_uploading_images = Process(target=self.send_image_to_dashboard)
-            process_handling_can_messages = Process(target=self.handle_can_message)
+            #process_uploading_images = Process(target=self.send_image_to_dashboard)
+            self.handle_can_message()
 
-            process_uploading_images.start()
+            #process_uploading_images.start()
             process_handling_can_messages.start()
 
         except KeyboardInterrupt:
@@ -55,7 +58,7 @@ if __name__ == "__main__":
     DASHBOARD_HOST_IP = "7.tcp.eu.ngrok.io"
     DASHBOARD_IMAGES_SAVING_DIRECTORY= "/mnt/HC_Volume_11785377/images/"
     CAMERA_POSITION_MAPPING = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
-    RM_SPEED_THRESHOLD = 1000 # Speed threshold is +- 10000
+    RM_SPEED_THRESHOLD = 50 # Speed threshold is +- 10000
     CAN_ID_LIST_TO_LISTEN = [0x3A0]
 
     central_handler = CentralHandler(liftbot_id=LIFTBOT_ID,

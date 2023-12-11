@@ -18,7 +18,10 @@ class Camera:
         self.OAK_device_pipeline = OAK_device_pipeline
         
     def process_image(self, context_manager, timestamp_saving_directory, date, timestamp):
-        OAK_device = context_manager.enter_context(dai.Device(self.OAK_device_info))
+        print(dai.Device.getAllAvailableDevices())
+        print("I'm here")
+        OAK_device = dai.Device(self.OAK_device_info)
+        print("init")
         OAK_device.startPipeline(self.OAK_device_pipeline)
 
         #define an input queue to send capture image event to depthai device
@@ -46,7 +49,7 @@ class Camera:
         if image_output_queue.has():
             frame = image_output_queue.get().getCvFrame()
             cv2.imwrite(image_file_directory, frame)
-
+            print("taken")
         else:
             print("No message")
 
@@ -65,6 +68,8 @@ class CameraHandler:
         camera_id = 0
         OAK_device_pipeline = self.set_depthai_common_pipeline()
         all_camera_devices = dai.Device.getAllAvailableDevices()
+        print(all_camera_devices)
+        print("Check 1")
 
         if len(all_camera_devices) != 0:
             for OAK_device_info in all_camera_devices:
@@ -108,7 +113,7 @@ class CameraHandler:
             self.process_images()
             self.rm_status = 1
 
-        if abs(rm_speed) < 400000 and abs(rm_speed) > 400:
+        if abs(rm_speed) < 400000 and abs(rm_speed) > 40: #correct value here is 400
             self.last_speed_registered = rm_speed
         else:
             self.rm_status = 0
