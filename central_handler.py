@@ -57,7 +57,7 @@ if __name__ == "__main__":
     DASHBOARD_HOST_NAME = "khang"
     DASHBOARD_HOST_IP = "7.tcp.eu.ngrok.io"
     DASHBOARD_IMAGES_SAVING_DIRECTORY= "/mnt/HC_Volume_11785377/images/"
-    CAMERA_POSITION_MAPPING = {0: "left", 1: "right"} # 0: left, 1: right, 2: top, 3: bottom
+    CAMERA_POSITION_MAPPING = {0: "left", 1: "right"} # 0: left, 1: right
     RM_SPEED_THRESHOLD = 50 # Speed threshold is +- 10000
     CAN_ID_LIST_TO_LISTEN = [0x3A0]
 

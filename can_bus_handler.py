@@ -1,7 +1,8 @@
 """
 This module allows the Camera Module to receive CAN messages from specified CAN ID
 
-It handles setting up CAN communication to connect  CAN controller to the CAN network.
+It handles setting up CAN communication to connect a CAN controller such as MCP2515
+to the CAN network.
 It creates a CAN bus object with specified filters which the Camera Module can
 use to receive CAN messages from different CAN IDs to determine whether it should capture images.
 It also disconnects the CAN controller from CAN network when the Camera Module is turned off.
@@ -18,13 +19,13 @@ import can
 
 class CanBusHandler:
     """
-    Setting up CAN communication and disconnecting from CAN network.
+    A class that handles setting up CAN communication and disconnecting from CAN network.
     """
 
     @staticmethod
     def setup_can(can_id_list_to_listen):
         """
-        Connect CAN controller to receive messages.
+        Connect CAN controller (MCP2515) to the CAN network to receive messages from specified CAN ID.
         Return a CAN object with specified CAN ID filters and masks.
 
         Args:
@@ -34,7 +35,8 @@ class CanBusHandler:
             can.interface.Bus : a CAN object.
 
         """
-        os.system('sudo ip link set can0 type can bitrate 1000000')
+        # Check whether the bitrate here matches RM's
+        os.system('sudo ip link set can0 type can bitrate 1000000') 
         os.system('sudo ifconfig can0 up')
 
         can_channel = 'can0'
