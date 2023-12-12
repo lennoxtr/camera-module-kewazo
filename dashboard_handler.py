@@ -102,7 +102,8 @@ class DashboardHandler:
 
         """
 
-        response_code = os.system(self.PING_DASHBOARD_COMMAND.format(dashboard_host_ip=self.dashboard_host_ip))
+        response_code = os.system(self.PING_DASHBOARD_COMMAND.format(
+            dashboard_host_ip=self.dashboard_host_ip))
         if response_code == 0:
             return True
         return False
@@ -142,18 +143,19 @@ class DashboardHandler:
                                         for saving images (Ex: /images) on the host device
         """
 
-        date_specific_folder_local_directory = os.path.join(self.local_images_saving_directory, date_specific_folder)
+        date_specific_folder_local_directory = os.path.join(
+            self.local_images_saving_directory, date_specific_folder)
         timestamp_folders_to_send = self.get_all_subfolders(date_specific_folder_local_directory)
 
         # Erase the date folder if it is empty.
         #
         # This usually happens if all timestamp folders were sent successfully
         # to the server on the previous Liftbot run (as all timestamp
-        # folders would then be deleted, leaving an empty date folder)  
+        # folders would then be deleted, leaving an empty date folder)
 
         if len(timestamp_folders_to_send) == 0:
             shutil.rmtree(date_specific_folder_local_directory)
-        
+
         # Do nothing if server is non-reachable
         elif self.is_connected_to_dashboard is False:
             pass
@@ -171,10 +173,11 @@ class DashboardHandler:
                     date_specific_folder=date_specific_folder))
             except:
                 print("Date specific folder already exist on dashboard")
-            
+
             # Send all timestamp folders under the date folder to the server
             for timestamp_folder in timestamp_folders_to_send:
-                subfolder_local_directory = os.path.join(date_specific_folder_local_directory, timestamp_folder)
+                subfolder_local_directory = os.path.join(
+                    date_specific_folder_local_directory, timestamp_folder)
                 try:
                     os.system(self.SEND_TO_DASHBOARD_COMMAND.format(
                         ssh_pass_file_name=self.ssh_pass_file_name,
@@ -184,16 +187,16 @@ class DashboardHandler:
                         dashboard_host_ip=self.dashboard_host_ip,
                         dashboard_images_saving_directory=self.dashboard_images_saving_directory,
                         date_specific_folder=date_specific_folder))
-                    
+
                     # Remove the timestamp folder on the host device if it was successfully
                     # sent to the server
                     shutil.rmtree(subfolder_local_directory)
                 except:
                     # If the server is not reachable during the process of sending images,
-                    # the server is assumed to be non-reachable indefinitely until the 
+                    # the server is assumed to be non-reachable indefinitely until the
                     # RM restarts. All subsequent images captured by the camers will be
                     # stored locally on host device. There will be no attempt to reconnect
-                    # to the server. 
+                    # to the server.
 
                     self.is_connected_to_dashboard = False
                     continue
@@ -227,10 +230,10 @@ class DashboardHandler:
 
         date_specific_directories_list = self.get_all_subfolders(self.local_images_saving_directory)
 
-        # Check there exists a date folder on host device 
+        # Check there exists a date folder on host device
         if len(date_specific_directories_list) > 0:
 
-            # The new image folders that the cameras have just captured in 
+            # The new image folders that the cameras have just captured in
             # the curent run will be at the end of the list
             latest_date_specific_folder = date_specific_directories_list[-1]
 
@@ -238,7 +241,8 @@ class DashboardHandler:
             unsend_image_folders_list = date_specific_directories_list[:-1]
 
             # Send newest image folder to server
-            process_send_live_images = Process(target=self.send_single_folder_to_dashboard(latest_date_specific_folder))
+            process_send_live_images = Process(target=self.send_single_folder_to_dashboard(
+                latest_date_specific_folder))
             process_send_live_images.start()
 
             # Check whether there are folders that were not send to the server in the previous run
@@ -250,9 +254,10 @@ class DashboardHandler:
             # 2. Date folder from the previous run exists, but it is empty. This usually happens if
             # all timestamp folders were sent successfully to the server on the previous Liftbot
             # run (as all timestamp folders would then be deleted, leaving an empty date folder). In
-            # this case, the folder will be deleted  
+            # this case, the folder will be deleted
             if len(unsend_image_folders_list) > 0:
-                process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard(unsend_image_folders_list))
+                process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard(
+                    unsend_image_folders_list))
                 process_send_old_images.start()
 
             process_send_live_images.join()

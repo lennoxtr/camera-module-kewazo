@@ -38,7 +38,8 @@ Typical usage example:
                 rm_speed_threshold, camera_position_mapping)
     camera_handler.execute(rm_speed)
 
-DepthAI's API documentation and tutorial can be found at: https://docs.luxonis.com/projects/api/en/latest/ 
+DepthAI's API documentation and tutorial can be found at:
+https://docs.luxonis.com/projects/api/en/latest/ 
 
 """
 
@@ -91,9 +92,9 @@ class Camera:
         host device in a specified folder. 
 
         Args:
-            context_manager (contextlib.ExitStack) : a context manager object to enter the context of 
-                                                    the initialized Device object and close it cleanly
-                                                    after use. 
+            context_manager (contextlib.ExitStack) : a context manager object to enter the
+                                                context of the initialized Device object and
+                                                close it cleanly after use. 
             timestamp_saving_directory (string) : the directory to save images
             date (string) : the date the image was captured, in the format YYMMDD
             timestamp (string) : the time the image was captured, in the format HHMMSS
@@ -165,7 +166,8 @@ class CameraHandler:
             rm_speed_threshold (int) : the speed threshold to determine whether the RM is
                                     actually moving. This is implemented as the RM_speed
                                     retrieved from CAN sometimes show very high value
-                                    like 400000 when the RM is not moving. 
+                                    like 400000 when the RM is not moving. It is an
+                                    absolute value
             camera_position_mapping (dictionary) : the dictionary to map camera's id to its
                                                 position on the TP. Only holds 2 values to
                                                 map to 'left' or 'right'
@@ -185,8 +187,8 @@ class CameraHandler:
         # Get all available OAK devices. Note that available means that
         # the device is connect and not in use.
         all_camera_devices = dai.Device.getAllAvailableDevices()
-        
-        # Intialize Camera object with the common pipeline. If a camera does not use 
+
+        # Intialize Camera object with the common pipeline. If a camera does not use
         # the common pipeline, it must be initialized separately.
 
         if len(all_camera_devices) != 0:
@@ -253,29 +255,31 @@ class CameraHandler:
         # 2. The current RM Speed is normal (abs(rm_speed) < 400000). This is implemented due to
         # the fact that even when the RM is stationary, the recorded speed sent via CAN Bus can
         #  sometimes be > 400000 or < -400000.
-        # 3. The absolute difference between the current RM speed and the last recorded RM speed is
-        # greater than the speed threshold. This is implemented as the camera should only capture images
-        # when the RM start moving (when the speed difference is large). When the RM is moving, although
-        # there will still be difference between the speed recorded, such difference is not very large.
+        # 3. The absolute difference between the current RM speed and the last recorded RM speed
+        # is greater than the speed threshold. This is implemented as the camera should only
+        # capture images when the RM start moving (when the speed difference is large). When
+        # the RM is moving, although there will still be difference between the speed recorded,
+        # such difference is not very large.
         #
         # Upon satisfying all 3 conditions, a command will be send to all cameras to capture images.
         # The RM status will also be updated to 1 (moving).
 
-        if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 400000 and self.rm_status == 0):
+        if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 400000 
+            and self.rm_status == 0):
             self.process_images()
             self.rm_status = 1
 
         # If the RM speed is normal (abs(rm_speed) < 400000 and abs(rm_speed) < 400000 > 40), the
-        # current RM speed will be recorded as the last RM speed to faciliate comparison with the next
-        # recorded RM speed.
+        # current RM speed will be recorded as the last RM speed to faciliate comparison
+        # with the next recorded RM speed.
 
         if abs(rm_speed) < 400000 and abs(rm_speed) > 40: #correct value here is 400
             self.last_speed_registered = rm_speed
-        
+
         # If the RM speed is not normal, the RM will be determined to be stationary.
         # Its status will be updated to 0 (stationary).
         # The last_speed_registered will also be 0.
-         
+
         else:
             self.rm_status = 0
             self.last_speed_registered = 0
@@ -293,14 +297,17 @@ class CameraHandler:
         date = datetime.date.today().strftime("%y%m%d")
         timestamp = datetime.datetime.now().strftime("%H%M%S")
 
-        # Generate date and timestamp saving directories 
-        date_specific_saving_directory = self.set_saving_directory(self.local_images_saving_directory, date)
-        timestamp_saving_directory = self.set_saving_directory(date_specific_saving_directory, timestamp)
+        # Generate date and timestamp saving directories
+        date_specific_saving_directory = self.set_saving_directory(
+            self.local_images_saving_directory, date)
+        timestamp_saving_directory = self.set_saving_directory(
+            date_specific_saving_directory, timestamp)
 
         with contextlib.ExitStack() as context_manager:
             process_list = []
             for camera_object in self.kewazo_camera_object_list:
-                # NOTE: Process-based parallelism does not work. Only Thread was found to work properly
+                # NOTE: Process-based parallelism does not work. Only Thread was
+                # found to work properly
                 process_capturing_image = threading.Thread(target=camera_object.process_image,
                                                            args=(context_manager,
                                                                 timestamp_saving_directory,
