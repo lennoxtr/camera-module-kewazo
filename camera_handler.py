@@ -102,7 +102,7 @@ class Camera:
         """
 
         # Initialize Device object with a specified pipeline
-        oak_device = dai.Device(self.oak_device_info)
+        oak_device : dai.Device = context_manager.enter_context(dai.Device(self.oak_device_info))
         oak_device.startPipeline(self.oak_device_pipeline)
 
         # Define an input queue to send capture image event to Depthai device
@@ -264,7 +264,7 @@ class CameraHandler:
         # Upon satisfying all 3 conditions, a command will be send to all cameras to capture images.
         # The RM status will also be updated to 1 (moving).
 
-        if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 400000 
+        if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 400000
             and self.rm_status == 0):
             self.process_images()
             self.rm_status = 1

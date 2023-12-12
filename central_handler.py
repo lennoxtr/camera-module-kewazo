@@ -15,11 +15,12 @@ Typical usage example:
     central_handler.start()
 
 """
+import time
 from multiprocessing import Process
 from can_bus_handler import CanBusHandler
 from camera_handler import CameraHandler
 from dashboard_handler import DashboardHandler
-import time
+
 
 class CentralHandler:
     """
@@ -36,7 +37,7 @@ class CentralHandler:
     def __init__(self, liftbot_id, ssh_pass_file_name, connection_port, dashboard_host_name,
                  dashboard_host_ip, dashboard_images_saving_directory, rm_speed_threshold,
                  camera_position_mapping, can_id_list_to_listen):
-        
+
         """
         Initialize the CentralHandler with the appropriate information so it can set up
         CAN communication and initialize Dashboardhandler and CameraHandler
@@ -72,8 +73,10 @@ class CentralHandler:
                                                   connection_port=connection_port,
                                                   dashboard_host_name=dashboard_host_name,
                                                   dashboard_host_ip=dashboard_host_ip,
-                                                  dashboard_images_saving_directory=dashboard_images_saving_directory,
-                                                  local_images_saving_directory=self.LOCAL_IMAGES_SAVING_DIRECTORY)
+                                                  dashboard_images_saving_directory=
+                                                  dashboard_images_saving_directory,
+                                                  local_images_saving_directory=
+                                                  self.LOCAL_IMAGES_SAVING_DIRECTORY)
         self.camera_handler = CameraHandler(liftbot_id=liftbot_id,
                                             local_images_saving_directory=self.LOCAL_IMAGES_SAVING_DIRECTORY,
                                             rm_speed_threshold=rm_speed_threshold,
@@ -131,14 +134,15 @@ if __name__ == "__main__":
     DASHBOARD_IMAGES_SAVING_DIRECTORY= "/mnt/HC_Volume_11785377/images/"
     CAMERA_POSITION_MAPPING = {0: "left", 1: "right"}
     RM_SPEED_THRESHOLD = 50 # Speed threshold is absolute value +- 10000
-    CAN_ID_LIST_TO_LISTEN = [0x3A0] 
+    CAN_ID_LIST_TO_LISTEN = [0x3A0]
 
     central_handler = CentralHandler(liftbot_id=LIFTBOT_ID,
                                      ssh_pass_file_name=SSH_PASS_FILE,
                                      connection_port=CONNECTION_PORT,
                                      dashboard_host_name=DASHBOARD_HOST_NAME,
                                      dashboard_host_ip=DASHBOARD_HOST_IP,
-                                     dashboard_images_saving_directory=DASHBOARD_IMAGES_SAVING_DIRECTORY,
+                                     dashboard_images_saving_directory=
+                                     DASHBOARD_IMAGES_SAVING_DIRECTORY,
                                      rm_speed_threshold=RM_SPEED_THRESHOLD,
                                      camera_position_mapping=CAMERA_POSITION_MAPPING,
                                      can_id_list_to_listen=CAN_ID_LIST_TO_LISTEN)
