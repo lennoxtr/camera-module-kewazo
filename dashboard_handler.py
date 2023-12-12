@@ -62,12 +62,8 @@ class DashboardHandler:
 
     """
     PING_DASHBOARD_COMMAND = 'ping -c 1 -W 2 {dashboard_host_ip}'
-    SEND_TO_DASHBOARD_COMMAND = '''sshpass -f {ssh_pass_file_name} scp -P {connection_port}
-     -o StrictHostKeyChecking=no -pr {local_image_folder_directory}
-     {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}'''
-    CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = '''sshpass -f {ssh_pass_file_name} 
-     ssh {dashboard_host_name}@{dashboard_host_ip}
-     -p {connection_port} mkdir {dashboard_folder_directory}'''
+    SEND_TO_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} scp -P {connection_port} -o StrictHostKeyChecking=no -pr {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
+    CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -p {connection_port} mkdir {dashboard_folder_directory}"
 
     def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
                  dashboard_images_saving_directory, local_images_saving_directory):
