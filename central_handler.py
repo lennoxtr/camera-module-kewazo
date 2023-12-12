@@ -116,9 +116,9 @@ class CentralHandler:
         Start camera system execution.
         """
         try:
+            process_handling_can_messages = Process(target=self.handle_can_message)
             #process_uploading_images = Process(target=self.send_image_to_dashboard)
-            self.handle_can_message()
-
+            
             #process_uploading_images.start()
             process_handling_can_messages.start()
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     CONNECTION_PORT = "18538"
     DASHBOARD_HOST_NAME = "khang"
     DASHBOARD_HOST_IP = "7.tcp.eu.ngrok.io"
-    DASHBOARD_IMAGES_SAVING_DIRECTORY= "/mnt/HC_Volume_11785377/images/"
+    DASHBOARD_IMAGES_SAVING_DIRECTORY= "./images/"
     CAMERA_POSITION_MAPPING = {0: "left", 1: "right"}
     RM_SPEED_THRESHOLD = 50 # Speed threshold is absolute value +- 10000
     CAN_ID_LIST_TO_LISTEN = [0x3A0]
