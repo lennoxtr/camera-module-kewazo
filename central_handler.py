@@ -16,6 +16,7 @@ Typical usage example:
 
 """
 import time
+import threading
 from multiprocessing import Process
 from can_bus_handler import CanBusHandler
 from camera_handler import CameraHandler
@@ -116,10 +117,10 @@ class CentralHandler:
         Start camera system execution.
         """
         try:
-            process_handling_can_messages = Process(target=self.handle_can_message)
-            #process_uploading_images = Process(target=self.send_image_to_dashboard)
+            process_handling_can_messages = threading.Thread(target=self.handle_can_message)
+            process_uploading_images = Process(target=self.send_image_to_dashboard)
             
-            #process_uploading_images.start()
+            process_uploading_images.start()
             process_handling_can_messages.start()
 
         except KeyboardInterrupt:
