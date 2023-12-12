@@ -62,8 +62,12 @@ class DashboardHandler:
 
     """
     PING_DASHBOARD_COMMAND = 'ping -c 1 -W 2 {dashboard_host_ip}'
-    SEND_TO_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} scp -P {connection_port} -o StrictHostKeyChecking=no -pr {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
-    CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -p {connection_port} mkdir {dashboard_folder_directory}"
+    SEND_TO_DASHBOARD_COMMAND = '''sshpass -f {ssh_pass_file_name} scp -P {connection_port}
+     -o StrictHostKeyChecking=no -pr {local_image_folder_directory}
+     {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}'''
+    CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = '''sshpass -f {ssh_pass_file_name} 
+     ssh {dashboard_host_name}@{dashboard_host_ip}
+     -p {connection_port} mkdir {dashboard_folder_directory}'''
 
     def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
                  dashboard_images_saving_directory, local_images_saving_directory):
@@ -161,7 +165,8 @@ class DashboardHandler:
             pass
 
         else:
-            dashboard_date_folder_directory = os.path.join(self.dashboard_images_saving_directory, date_specific_folder)
+            dashboard_date_folder_directory = os.path.join(
+                self.dashboard_images_saving_directory, date_specific_folder)
             try:
                 # Create a new folder on the server with the same name as the date folder if it
                 # doesn't exist
@@ -171,7 +176,7 @@ class DashboardHandler:
                     dashboard_host_ip=self.dashboard_host_ip,
                     connection_port=self.connection_port,
                     dashboard_folder_directory=dashboard_date_folder_directory))
-            except:
+            except FileExistsError:
                 print("Date specific folder already exist on dashboard")
             # Send all timestamp folders under the date folder to the server
             for timestamp_folder in timestamp_folders_to_send:
