@@ -25,7 +25,8 @@ class CanBusHandler:
     @staticmethod
     def setup_can(can_id_list_to_listen):
         """
-        Connect CAN controller (MCP2515) to the CAN network to receive messages from specified CAN ID.
+        Connect CAN controller (MCP2515) to the CAN network to receive messages
+        from specified CAN ID.
         Return a CAN object with specified CAN ID filters and masks.
 
         Args:
@@ -36,7 +37,7 @@ class CanBusHandler:
 
         """
         # Check whether the bitrate here matches RM's
-        os.system('sudo ip link set can0 type can bitrate 1000000') 
+        os.system('sudo ip link set can0 type can bitrate 1000000')
         os.system('sudo ifconfig can0 up')
 
         can_channel = 'can0'

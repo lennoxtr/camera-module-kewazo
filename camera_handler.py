@@ -9,9 +9,10 @@ Platform (TP).
 It allows the user to set up either a common operation pipeline for all cameras, or different
 pipeline for each camera if need. 
 It allows all Camera objects to be controlled from a single class, the CameraHandler. The
-CameraHandler class facilitates multiprocess operation of all Camera objects via Thread. Camerahandler
-also sets a common saving directory for all cameras. After receiving the RM's speed information from
-the CAN layer, it determines whether the Camera objects should remain idle, or take pictures.
+CameraHandler class facilitates multiprocess operation of all Camera objects via Thread.
+Camerahandler also sets a common saving directory for all cameras. After receiving the RM's
+speed information from the CAN layer, it determines whether the Camera objects should remain idle,
+or take pictures.
 
 The structure of folders to save images is as follows:
 .
@@ -27,10 +28,10 @@ The structure of folders to save images is as follows:
                         |_ Image 2
                         |
                         |_ ...
-                        
+
 Typical usage example:
 
-    kewazo_camera_object = Camera(liftbot_id, camera_name, OAK_device_info, OAK_device_pipeline)
+    kewazo_camera_object = Camera(liftbot_id, camera_name, oak_device_info, oak_device_pipeline)
     kewazo_camera_object.process_image(context_manager, timestamp_saving_directory, date, timestamp)
 
     camera_handler = CameraHandler(liftbot_id, local_images_saving_directory,
@@ -44,10 +45,10 @@ DepthAI's API documentation and tutorial can be found at: https://docs.luxonis.c
 import os
 import threading
 import contextlib
-import cv2
 import datetime
-import depthai as dai
 import time
+import cv2
+import depthai as dai
 
 class Camera:
     """
@@ -60,7 +61,7 @@ class Camera:
 
     IMAGE_NAMING = "{liftbot_id}_{camera_name}_{date}_{timestamp}.jpg"
 
-    def __init__(self, liftbot_id, camera_name, OAK_device_info, OAK_device_pipeline):
+    def __init__(self, liftbot_id, camera_name, oak_device_info, oak_device_pipeline):
         """
         Initialize the camera object with information specific to Liftbot, such as
         Liftbot ID and camera placement on TP.
@@ -70,19 +71,19 @@ class Camera:
                                 to know which Liftbot the camera belongs to
             camera_name (string) : a name that suggests the placement of the camera on TP.
                                 Limited to 'left' or 'right'.
-            OAK_device_info (dai.DeviceInfo) : a DepthAI's DeviceInfo object to initialize
+            oak_device_info (dai.DeviceInfo) : a DepthAI's DeviceInfo object to initialize
                                                 DepthAI's Device object
-            OAK_device_pipeline (dai.Pipeline) : a DepthAI's Pipeline object to control
+            oak_device_pipeline (dai.Pipeline) : a DepthAI's Pipeline object to control
                                                 how DepthAI camera take pictures, the resolution
                                                 of pictures, image detection, ... and how 
-                                                it sends pictures to host device                                                    
+                                                it sends pictures to host device
 
         """
         self.liftbot_id = liftbot_id
         self.camera_name = camera_name
-        self.OAK_device_info = OAK_device_info
-        self.OAK_device_pipeline = OAK_device_pipeline
-        
+        self.oak_device_info = oak_device_info
+        self.oak_device_pipeline = oak_device_pipeline
+
     def process_image(self, context_manager, timestamp_saving_directory, date, timestamp):
         """
         Initialize DepthAI's Device object from DeviceInfo object, generate input queue to receive
@@ -100,20 +101,20 @@ class Camera:
         """
 
         # Initialize Device object with a specified pipeline
-        OAK_device = dai.Device(self.OAK_device_info)
-        OAK_device.startPipeline(self.OAK_device_pipeline)
+        oak_device = dai.Device(self.oak_device_info)
+        oak_device.startPipeline(self.oak_device_pipeline)
 
         # Define an input queue to send capture image event to Depthai device
         # maxSize=1 and blocking=False means that only the latest capture event is in the queue
         # This is to prevent the camera from receving too many capture events within a short period
         # Which may happen when the RM moves a lot in short period
-        input_control_queue = OAK_device.getInputQueue(name="control", maxSize=1, blocking=False)
+        input_control_queue = oak_device.getInputQueue(name="control", maxSize=1, blocking=False)
 
         # Define an image output queue with non-blocking behavior for the Depthai device
         # maxSize=1 and blocking=False means that only the latest captured is in the output queue
-        image_output_queue = OAK_device.getOutputQueue(name="still", maxSize=1, blocking=False)
+        image_output_queue = oak_device.getOutputQueue(name="still", maxSize=1, blocking=False)
 
-        # Define capture event for depthai_device 
+        # Define capture event for depthai_device
         ctrl = dai.CameraControl()
         ctrl.setCaptureStill(True)
 
@@ -128,7 +129,7 @@ class Camera:
                                               camera_name=self.camera_name,
                                               date=date,
                                               timestamp=timestamp)
-        
+
         image_file_directory = os.path.join(timestamp_saving_directory, image_file_name)
 
         if image_output_queue.has():
@@ -178,8 +179,8 @@ class CameraHandler:
         self.rm_status = 0 # Current state of RM. 1 is moving, 0 is stationary
 
         camera_id = 0
-        # Generate a common Pipeline for all Depth AI camera. 
-        OAK_device_pipeline = self.set_depthai_common_pipeline()
+        # Generate a common Pipeline for all Depth AI camera.
+        oak_device_pipeline = self.set_depthai_common_pipeline()
 
         # Get all available OAK devices. Note that available means that
         # the device is connect and not in use.
@@ -187,16 +188,16 @@ class CameraHandler:
         
         # Intialize Camera object with the common pipeline. If a camera does not use 
         # the common pipeline, it must be initialized separately.
+
         if len(all_camera_devices) != 0:
-            for OAK_device_info in all_camera_devices:
+            for oak_device_info in all_camera_devices:
                 kewazo_camera_object = Camera(liftbot_id=liftbot_id,
                                    camera_name=camera_position_mapping[camera_id],
-                                   OAK_device_info=OAK_device_info,
-                                   OAK_device_pipeline=OAK_device_pipeline)
+                                   oak_device_info=oak_device_info,
+                                   oak_device_pipeline=oak_device_pipeline)
                 self.kewazo_camera_object_list.append(kewazo_camera_object)
                 camera_id += 1
 
-    
     def set_depthai_common_pipeline(self):
         """
         Generate a common Pipeline for all DepthAI Device.
@@ -214,7 +215,7 @@ class CameraHandler:
 
         # Define a Color Camera Node for getting image frames from camera
         cam_rgb = pipeline.create(dai.node.ColorCamera)
-       
+
         # Define xLinkIn node for receiving capture image event from host device
         xin_still = pipeline.create(dai.node.XLinkIn)
         xin_still.setStreamName("control")
@@ -301,9 +302,11 @@ class CameraHandler:
             for camera_object in self.kewazo_camera_object_list:
                 # NOTE: Process-based parallelism does not work. Only Thread was found to work properly
                 process_capturing_image = threading.Thread(target=camera_object.process_image,
-                                                           args=(context_manager, timestamp_saving_directory, date, timestamp))
+                                                           args=(context_manager,
+                                                                timestamp_saving_directory,
+                                                                date,
+                                                                timestamp))
                 process_capturing_image.start()
                 process_list.append(process_capturing_image)
-        
             for process in process_list:
                 process.join()
