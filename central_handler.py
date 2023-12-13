@@ -44,7 +44,7 @@ class CentralHandler:
         CAN communication and initialize Dashboardhandler and CameraHandler
 
         Args:
-            liftbot_id (int) : an ID to differentiate between multiple Liftbots 
+            liftbot_id (string) : an ID to differentiate between multiple Liftbots 
                             to know which Liftbot the camera belongs to
             ssh_pass_file_name (.txt) : a file that contains the ssh password to
                                     connect to the server

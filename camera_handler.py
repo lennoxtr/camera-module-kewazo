@@ -274,7 +274,7 @@ class CameraHandler:
         # current RM speed will be recorded as the last RM speed to faciliate comparison
         # with the next recorded RM speed.
 
-        if abs(rm_speed) < 400000 and abs(rm_speed) > 40: #correct value here is 400
+        if abs(rm_speed) < 400000 and abs(rm_speed) > 400: #correct value here is 400
             self.last_speed_registered = rm_speed
 
         # If the RM speed is not normal, the RM will be determined to be stationary.
