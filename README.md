@@ -36,7 +36,7 @@ pip -r install requirements.txt
 ```
 sudo python3 central_handler.py
 ```
-$~~~~~~~~~$ If running simuation, run the script on the simulating device
+$~~~~~~~~~$ If running simulation, run the script on the simulating device
 ```
 sudo python3 rm_speed_simulation.py
 ```
@@ -44,10 +44,10 @@ sudo python3 rm_speed_simulation.py
 ## Electrical Architecture
 ### Running on actual TP
 * The block diagram below is for using OAK-1 Lite cameras
-![Electrical Architecture for running on TP]
+![Electrical Architecture for running on TP](https://github.com/lennoxtr/camera-module-kewazo/blob/OAK_support/Electrical/Running%20on%20TP.png)
 ### Running simulation
 * The block diagram below is for using OAK-1 Lite cameras, and Raspberry Pi Zero 2 as simulating device
-![Electrical Architecture for running simulation]
+![Electrical Architecture for running simulation](https://github.com/lennoxtr/camera-module-kewazo/blob/OAK_support/Electrical/Running%20Simulation.png)
 
 
 ## External Documentation
