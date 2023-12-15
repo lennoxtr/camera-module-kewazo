@@ -155,7 +155,7 @@ class DashboardHandler:
                     # Remove the timestamp folder on the host device if it was successfully
                     # sent to the server
                     shutil.rmtree(subfolder_local_directory)
-                except:
+                except TimeoutError:
                     continue
 
     def send_multiple_folders_to_dashboard(self, local_image_folder_list):
