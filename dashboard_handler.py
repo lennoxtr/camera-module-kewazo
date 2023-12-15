@@ -8,12 +8,6 @@ be send to. The images stored locally on host device will then be deleted. If
 the check shows that server is not reachable, the captured images will remain
 stored locally on host device.
 
-If during the process of sending captured images to the server, the server
-becomes unreachable, all subsequent images will remain stored locally on
-host device.
-
-Upon losing connection with the server, there will be no attempt to reconnect.
-
 The structure of folders to save images on the server is as follows:
 .
 |
@@ -46,23 +40,15 @@ from multiprocessing import Process, Pool
 class DashboardHandler:
     """
     A class that handles sending image folders to dashboard using
-    process-based parallelism. It also pings the server to check for connection.
+    rsync and process-based parallelism. 
 
     If the image folders are sent successfully to the server, DashboardHandler will
     erase the copy of the corresponding folder on the host device. That is, after
     it send /230717 on the host device to the server, it will erase the /230717 
     folder on the host device.
 
-    If during the process of sending captured images to the server, the server
-    becomes unreachable, the DashboardHandler will not send any subsequent image
-    folder to the server.
-
-    Upon losing connection with the server, DashboardHandler will not attempt
-    to reconnect. 
-
     """
-    PING_DASHBOARD_COMMAND = 'ping -c 1 -W 2 {dashboard_host_ip}'
-    SEND_TO_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} scp -P {connection_port} -o StrictHostKeyChecking=no -pr {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
+    SEND_TO_DASHBOARD_COMMAND = "rsync -ar -P -e 'sshpass -f {ssh_pass_file_name} ssh -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
     CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -p {connection_port} mkdir {dashboard_folder_directory}"
 
     def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
@@ -90,23 +76,6 @@ class DashboardHandler:
         self.dashboard_host_ip = dashboard_host_ip
         self.dashboard_images_saving_directory = dashboard_images_saving_directory
         self.local_images_saving_directory = local_images_saving_directory
-
-        # Perform a ping to check server connection
-        self.is_connected_to_dashboard = self.connect_to_dashboard()
-
-    def connect_to_dashboard(self):
-        """
-        Ping the server to check for server connection. The function will send 1 packet
-        for wait for 2 seconds for a reply. If it does not receive any, it will
-        assume that the server is non reachable.
-
-        """
-
-        response_code = os.system(self.PING_DASHBOARD_COMMAND.format(
-            dashboard_host_ip=self.dashboard_host_ip))
-        if response_code == 0:
-            return True
-        return False
 
     def get_all_subfolders(self, local_folder_directory):
         """
@@ -156,10 +125,6 @@ class DashboardHandler:
         if len(timestamp_folders_to_send) == 0:
             shutil.rmtree(date_specific_folder_local_directory)
 
-        # Do nothing if server is non-reachable
-        elif self.is_connected_to_dashboard is False:
-            pass
-
         else:
             dashboard_date_folder_directory = os.path.join(
                 self.dashboard_images_saving_directory, date_specific_folder)
@@ -191,13 +156,6 @@ class DashboardHandler:
                     # sent to the server
                     shutil.rmtree(subfolder_local_directory)
                 except:
-                    # If the server is not reachable during the process of sending images,
-                    # the server is assumed to be non-reachable indefinitely until the
-                    # RM restarts. All subsequent images captured by the camers will be
-                    # stored locally on host device. There will be no attempt to reconnect
-                    # to the server.
-
-                    self.is_connected_to_dashboard = False
                     continue
 
     def send_multiple_folders_to_dashboard(self, local_image_folder_list):
