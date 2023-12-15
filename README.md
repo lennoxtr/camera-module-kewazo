@@ -25,7 +25,7 @@ Currently, the system supports [OAK-1 Lite](https://shop.luxonis.com/products/oa
 * For normal webcam cameras, checkout main
 2. Clone the repository
 ```
-git clone https://github.com/lennoxtr/camera-module-kewazo.git
+git clone https://github.com/lennoxtr/camera-module-kewazo.git/tree/{branch}
 ```
 2. Install dependencies on host device
 ```
