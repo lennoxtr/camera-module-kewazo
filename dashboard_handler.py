@@ -48,7 +48,7 @@ class DashboardHandler:
     folder on the host device.
 
     """
-    SEND_TO_DASHBOARD_COMMAND = "rsync -ar -P  --timeout=5 -e 'sshpass -f {ssh_pass_file_name} ssh -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
+    SEND_TO_DASHBOARD_COMMAND = "rsync -ar -P --append --timeout=5 -e 'sshpass -f {ssh_pass_file_name} ssh -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
     CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -p {connection_port} -o StrictHostKeyChecking=no mkdir {dashboard_folder_directory}"
 
     def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
