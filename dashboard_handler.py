@@ -40,6 +40,7 @@ Typical usage example:
 """
 
 import os
+import datetime
 import shutil
 from multiprocessing import Process, Pool
 
@@ -129,7 +130,7 @@ class DashboardHandler:
 
     def send_single_folder_to_dashboard(self, date_specific_folder):
         """
-        Send a single folder to the server. It also updates whether the server
+        Send a single date folder to the server. It also updates whether the server
         is reachable. 
 
         If the image folders are sent successfully to the server, DashboardHandler will
@@ -143,17 +144,21 @@ class DashboardHandler:
                                         for saving images (Ex: /images) on the host device
         """
 
+        current_date = datetime.date.today().strftime("%y%m%d")
         date_specific_folder_local_directory = os.path.join(
             self.local_images_saving_directory, date_specific_folder)
         timestamp_folders_to_send = self.get_all_subfolders(date_specific_folder_local_directory)
 
-        # Erase the date folder if it is empty.
+        # Erase the date folder if it is empty, but only if the date is
+        # different from today. That is, the date folder is of the past.
+        # For example, if today is 22 Dec 2023, the folder 231222 won't
+        # get deleted evenif it's empty, but the folder 231221 will.
         #
         # This usually happens if all timestamp folders were sent successfully
         # to the server on the previous Liftbot run (as all timestamp
         # folders would then be deleted, leaving an empty date folder)
 
-        if len(timestamp_folders_to_send) == 0:
+        if len(timestamp_folders_to_send) == 0 and current_date!=date_specific_folder:
             shutil.rmtree(date_specific_folder_local_directory)
 
         # Do nothing if server is non-reachable

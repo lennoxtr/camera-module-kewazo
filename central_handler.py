@@ -111,7 +111,6 @@ class CentralHandler:
             # NOTE: CAN message follows little endian system.
             rm_speed = int.from_bytes(rm_speed_as_bytes, byteorder='little', signed=True)
             self.camera_handler.execute(rm_speed)
-            time.sleep(1)
 
     def start(self):
         """
@@ -138,7 +137,7 @@ if __name__ == "__main__":
     DASHBOARD_HOST_IP = "7.tcp.eu.ngrok.io"
     DASHBOARD_IMAGES_SAVING_DIRECTORY= "./images"
     CAMERA_POSITION_MAPPING = {0: "left", 1: "right"}
-    RM_SPEED_THRESHOLD = 50 # Speed threshold is absolute value +- 10000
+    RM_SPEED_THRESHOLD = 50 # Speed threshold is absolute value +- 50
     CAN_ID_LIST_TO_LISTEN = [0x3A0]
 
     central_handler = CentralHandler(liftbot_id=LIFTBOT_ID,

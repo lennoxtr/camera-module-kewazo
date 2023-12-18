@@ -265,7 +265,7 @@ class CameraHandler:
         # Upon satisfying all 3 conditions, a command will be send to all cameras to capture images.
         # The RM status will also be updated to 1 (moving).
 
-        if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 400000
+        if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 250
             and self.rm_status == 0):
             self.process_images()
             self.rm_status = 1
@@ -274,7 +274,7 @@ class CameraHandler:
         # current RM speed will be recorded as the last RM speed to faciliate comparison
         # with the next recorded RM speed.
 
-        if abs(rm_speed) < 400000 and abs(rm_speed) > 400: #correct value here is 400
+        if abs(rm_speed) < 250 and abs(rm_speed) > 150: #correct value here is 400
             self.last_speed_registered = rm_speed
 
         # If the RM speed is not normal, the RM will be determined to be stationary.
