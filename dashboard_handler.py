@@ -34,6 +34,7 @@ Typical usage example:
 """
 
 import os
+import datetime
 import shutil
 from multiprocessing import Process, Pool
 
@@ -112,6 +113,7 @@ class DashboardHandler:
                                         for saving images (Ex: /images) on the host device
         """
 
+        curent_date = datetime.date.today().strftime("%y%m%d")
         date_specific_folder_local_directory = os.path.join(
             self.local_images_saving_directory, date_specific_folder)
         timestamp_folders_to_send = self.get_all_subfolders(date_specific_folder_local_directory)
@@ -122,7 +124,7 @@ class DashboardHandler:
         # to the server on the previous Liftbot run (as all timestamp
         # folders would then be deleted, leaving an empty date folder)
 
-        if len(timestamp_folders_to_send) == 0:
+        if len(timestamp_folders_to_send) == 0 and curent_date != date_specific_folder:
             shutil.rmtree(date_specific_folder_local_directory)
 
         else:
