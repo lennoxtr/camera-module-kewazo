@@ -91,8 +91,7 @@ class CentralHandler:
 
         """
         while True:
-            if self.dashboard_handler.is_connected_to_dashboard:
-                self.dashboard_handler.execute()
+            self.dashboard_handler.execute()
 
     def handle_can_message(self):
         """
