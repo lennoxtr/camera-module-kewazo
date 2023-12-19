@@ -35,6 +35,7 @@ Typical usage example:
 
 import os
 import datetime
+import time
 import shutil
 from multiprocessing import Process, Pool
 
@@ -49,7 +50,7 @@ class DashboardHandler:
     folder on the host device.
 
     """
-    SEND_TO_DASHBOARD_COMMAND = "rsync -ar -P --append --timeout=5 -e 'sshpass -f {ssh_pass_file_name} ssh -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
+    SEND_TO_DASHBOARD_COMMAND = "rsync -ar -P --append -e 'sshpass -f {ssh_pass_file_name} ssh -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
     CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -p {connection_port} -o StrictHostKeyChecking=no 'mkdir -p {dashboard_folder_directory}'"
 
     def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
@@ -157,6 +158,7 @@ class DashboardHandler:
                         dashboard_host_name=self.dashboard_host_name,
                         dashboard_host_ip=self.dashboard_host_ip,
                         dashboard_directory_to_send=dashboard_date_folder_directory))
+                    print("Success")
 
                     # Remove the timestamp folder on the host device if it was successfully
                     # sent to the server
@@ -179,6 +181,7 @@ class DashboardHandler:
 
         with Pool() as p:
             p.map(self.send_single_folder_to_dashboard, local_image_folder_list)
+        time.sleep(2)
 
     def execute(self):
         """
@@ -204,9 +207,8 @@ class DashboardHandler:
             unsend_image_folders_list = date_specific_directories_list[:-1]
 
             # Send newest image folder to server
-            process_send_live_images = Process(target=self.send_single_folder_to_dashboard(
-                latest_date_specific_folder))
-            process_send_live_images.start()
+            self.send_single_folder_to_dashboard(
+                latest_date_specific_folder)
 
             # Check whether there are folders that were not send to the server in the previous run
             #
@@ -218,14 +220,6 @@ class DashboardHandler:
             # all timestamp folders were sent successfully to the server on the previous Liftbot
             # run (as all timestamp folders would then be deleted, leaving an empty date folder). In
             # this case, the folder will be deleted
-            if len(unsend_image_folders_list) > 0:
-                process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard(
-                    unsend_image_folders_list))
-                process_send_old_images.start()
-
-            process_send_live_images.join()
-            if len(unsend_image_folders_list) > 0:
-                process_send_old_images.join()
 
         # Do nothing if there is no date folder on host device
         else:

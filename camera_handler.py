@@ -135,8 +135,8 @@ class Camera:
 
         if image_output_queue.has():
             frame = image_output_queue.get().getCvFrame()
-            cv2.imwrite(image_file_directory, frame)
-            print("Saved")
+            a = cv2.imwrite(image_file_directory, frame)
+            print("Save status: ", a)
         else:
             return
 
