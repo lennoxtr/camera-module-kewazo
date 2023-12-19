@@ -161,6 +161,8 @@ class DashboardHandler:
                         dashboard_host_ip=self.dashboard_host_ip,
                         dashboard_directory_to_send=dashboard_date_folder_directory))
                     
+                    time.sleep(1)
+                    
                     # Remove the timestamp folder on the host device if it was successfully
                     # sent to the server
                     shutil.rmtree(subfolder_local_directory)
@@ -182,7 +184,6 @@ class DashboardHandler:
 
         with Pool() as p:
             p.map(self.send_single_folder_to_dashboard, local_image_folder_list)
-        time.sleep(2)
 
     def execute(self):
         """
@@ -222,7 +223,7 @@ class DashboardHandler:
             # all timestamp folders were sent successfully to the server on the previous Liftbot
             # run (as all timestamp folders would then be deleted, leaving an empty date folder). In
             # this case, the folder will be deleted
-            
+
             if len(unsend_image_folders_list) > 0:
                 process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard(
                     unsend_image_folders_list))
