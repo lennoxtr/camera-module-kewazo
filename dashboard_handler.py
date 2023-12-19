@@ -209,8 +209,8 @@ class DashboardHandler:
             unsend_image_folders_list = date_specific_directories_list[:-1]
 
             # Send newest image folder to server
-            process_send_live_images = Process(target=self.send_single_folder_to_dashboard, args=
-                latest_date_specific_folder)
+            process_send_live_images = Process(target=self.send_single_folder_to_dashboard(
+                latest_date_specific_folder))
             process_send_live_images.start()
 
             # Check whether there are folders that were not send to the server in the previous run
@@ -225,8 +225,8 @@ class DashboardHandler:
             # this case, the folder will be deleted
 
             if len(unsend_image_folders_list) > 0:
-                process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard, args=
-                    unsend_image_folders_list)
+                process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard(
+                    unsend_image_folders_list))
                 process_send_old_images.start()
 
             process_send_live_images.join()
