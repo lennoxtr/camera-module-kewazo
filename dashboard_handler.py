@@ -8,32 +8,29 @@ be send to. The images stored locally on host device will then be deleted. If
 the check shows that server is not reachable, the captured images will remain
 stored locally on host device.
 
-If during the process of sending captured images to the server, the server
-becomes unreachable, all subsequent images will remain stored locally on
-host device.
-
-Upon losing connection with the server, there will be no attempt to reconnect.
-
 The structure of folders to save images on the server is as follows:
 .
 |
 |_ Top directory to save image on server (Example: /images)
         |
-        |_ Date specific saving folder (Example: /230717, denoting 17 July 2023)
+        |_ Liftbot ID folder (Example: /LB1)
                 |
-                |_ Timestamp saving folder (Example: /130450, denoting 1:04:50 PM)
+                |_ Date specific saving folder (Example: /230717, denoting 17 July 2023)
                         |
-                        |_ Image 1
-                        |
-                        |_ Image 2
-                        |
-                        |_ ...
+                        |_ Timestamp saving folder (Example: /130450, denoting 1:04:50 PM)
+                                |
+                                |_ Image 1
+                                |
+                                |_ Image 2
+                                |
+                                |_ ...
 
 
 Typical usage example:
-    dashboard_handler = DashboardHandler(ssh_pass_file_name, connection_port,
+    dashboard_handler = DashboardHandler(liftbot_id,
+                                        ssh_pass_file_name, connection_port,
                                         dashboard_host_name, dashboard_host_ip,
-                                        dashboard_images_saving_directory,
+                                        dashboard_top_saving_directory,
                                         local_images_saving_directory)
     dashboard_handler.execute()
 
@@ -41,73 +38,56 @@ Typical usage example:
 
 import os
 import datetime
+import time
 import shutil
+import logging
 from multiprocessing import Process, Pool
 
 class DashboardHandler:
     """
     A class that handles sending image folders to dashboard using
-    process-based parallelism. It also pings the server to check for connection.
+    rsync and process-based parallelism. 
 
     If the image folders are sent successfully to the server, DashboardHandler will
     erase the copy of the corresponding folder on the host device. That is, after
     it send /230717 on the host device to the server, it will erase the /230717 
     folder on the host device.
 
-    If during the process of sending captured images to the server, the server
-    becomes unreachable, the DashboardHandler will not send any subsequent image
-    folder to the server.
-
-    Upon losing connection with the server, DashboardHandler will not attempt
-    to reconnect. 
-
     """
-    PING_DASHBOARD_COMMAND = 'ping -c 1 -W 2 {dashboard_host_ip}'
-    SEND_TO_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} scp -P {connection_port} -o StrictHostKeyChecking=no -pr {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
-    CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -o StrictHostKeyChecking=no -p {connection_port} 'mkdir -p {dashboard_folder_directory}'"
 
-    def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
-                 dashboard_images_saving_directory, local_images_saving_directory):
+    SEND_TO_DASHBOARD_COMMAND = "rsync -ar --timeout=5 -q -P --append -e 'sshpass -f {ssh_pass_file_name} ssh -q -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
+    CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -p {connection_port} -o StrictHostKeyChecking=no 'mkdir -p {dashboard_folder_directory}'"
+
+    def __init__(self, liftbot_id, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
+                 dashboard_top_saving_directory, local_images_saving_directory):
         """
         Initialize the DashboardHandler with the appropriate information to connect to the server.
 
         Args:
+            liftbot_id (string) : an ID to differentiate between multiple Liftbots 
+                            to know which Liftbot the camera belongs to
             ssh_pass_file_name (.txt) : a file that contains the ssh password to connect to
                                         the server
             connection_port (int) : a number to indicate which port on the server to
                                         connect to
             dashboard_host_name (string) : the server's host name 
             dashboard_host_ip (string) : the server's host ip
-            dashboard_images_saving_directory (string) : the top folder that contains all the
-                                                        images on the server
+            dashboard_top_saving_directory (string) : the top folder that contains all the
+                                                        images of all liftbots on the server
             local_images_saving_directory : the top folder that contains all the
                                             images on the host device
 
         """
 
+        self.liftbot_id = liftbot_id
         self.ssh_pass_file_name = ssh_pass_file_name
         self.connection_port = connection_port
         self.dashboard_host_name = dashboard_host_name
         self.dashboard_host_ip = dashboard_host_ip
-        self.dashboard_images_saving_directory = dashboard_images_saving_directory
+        self.dashboard_lb_saving_directory = os.path.join(dashboard_top_saving_directory, liftbot_id)
         self.local_images_saving_directory = local_images_saving_directory
+        logging.basicConfig(filename='./log/debug.log', filemode='a', level=logging.WARNING)
 
-        # Perform a ping to check server connection
-        self.is_connected_to_dashboard = self.connect_to_dashboard()
-
-    def connect_to_dashboard(self):
-        """
-        Ping the server to check for server connection. The function will send 1 packet
-        for wait for 2 seconds for a reply. If it does not receive any, it will
-        assume that the server is non reachable.
-
-        """
-
-        response_code = os.system(self.PING_DASHBOARD_COMMAND.format(
-            dashboard_host_ip=self.dashboard_host_ip))
-        if response_code == 0:
-            return True
-        return False
 
     def get_all_subfolders(self, local_folder_directory):
         """
@@ -144,6 +124,7 @@ class DashboardHandler:
                                         for saving images (Ex: /images) on the host device
         """
 
+
         current_date = datetime.date.today().strftime("%y%m%d")
         date_specific_folder_local_directory = os.path.join(
             self.local_images_saving_directory, date_specific_folder)
@@ -158,16 +139,14 @@ class DashboardHandler:
         # to the server on the previous Liftbot run (as all timestamp
         # folders would then be deleted, leaving an empty date folder)
 
-        if len(timestamp_folders_to_send) == 0 and current_date!=date_specific_folder:
+        if len(timestamp_folders_to_send) == 0 and current_date != date_specific_folder:
             shutil.rmtree(date_specific_folder_local_directory)
-
-        # Do nothing if server is non-reachable
-        elif self.is_connected_to_dashboard is False:
-            pass
+            logging.info("Removed folder ", date_specific_folder_local_directory,
+                          " from local host. Folder from previous date")
 
         else:
             dashboard_date_folder_directory = os.path.join(
-                self.dashboard_images_saving_directory, date_specific_folder)
+                self.dashboard_lb_saving_directory, date_specific_folder)
             try:
                 # Create a new folder on the server with the same name as the date folder if it
                 # doesn't exist
@@ -178,11 +157,18 @@ class DashboardHandler:
                     connection_port=self.connection_port,
                     dashboard_folder_directory=dashboard_date_folder_directory))
             except FileExistsError:
-                print("Date specific folder already exist on dashboard")
+                logging.warning("Folder ", dashboard_date_folder_directory, " already exist on server")
+            except TimeoutError:
+                logging.warning("Server connection lost when creating folder ",
+                                dashboard_date_folder_directory)
+            except:
+                logging.exception("Unknown Error when creating new date folder on server")
             # Send all timestamp folders under the date folder to the server
             for timestamp_folder in timestamp_folders_to_send:
                 subfolder_local_directory = os.path.join(
                     date_specific_folder_local_directory, timestamp_folder)
+                if len(os.listdir(subfolder_local_directory)) == 0:
+                    return
                 try:
                     os.system(self.SEND_TO_DASHBOARD_COMMAND.format(
                         ssh_pass_file_name=self.ssh_pass_file_name,
@@ -191,19 +177,21 @@ class DashboardHandler:
                         dashboard_host_name=self.dashboard_host_name,
                         dashboard_host_ip=self.dashboard_host_ip,
                         dashboard_directory_to_send=dashboard_date_folder_directory))
-
+                    
+                    time.sleep(1)
+                    
                     # Remove the timestamp folder on the host device if it was successfully
                     # sent to the server
-                    shutil.rmtree(subfolder_local_directory)
-                except:
-                    # If the server is not reachable during the process of sending images,
-                    # the server is assumed to be non-reachable indefinitely until the
-                    # RM restarts. All subsequent images captured by the camers will be
-                    # stored locally on host device. There will be no attempt to reconnect
-                    # to the server.
-
-                    self.is_connected_to_dashboard = False
+                    if os.path.isdir(subfolder_local_directory):
+                        shutil.rmtree(subfolder_local_directory)
+                        logging.info("Folder ", subfolder_local_directory,
+                                 " sent to server and removed from local host")
+                except TimeoutError:
+                    logging.warning("Server connection lost when sending image folder ",
+                                    subfolder_local_directory)
                     continue
+                except:
+                    logging.exception("Unknown Error when sending images to server")
 
     def send_multiple_folders_to_dashboard(self, local_image_folder_list):
         """
@@ -232,9 +220,25 @@ class DashboardHandler:
 
         """
 
+        # Create a Liftbot-specific folder (Example: /images/LB1) on the server if it
+        # doesn't exist 
+        try:
+            os.system(self.CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND.format(
+                ssh_pass_file_name=self.ssh_pass_file_name,
+                dashboard_host_name=self.dashboard_host_name,
+                dashboard_host_ip=self.dashboard_host_ip,
+                connection_port=self.connection_port,
+                dashboard_folder_directory=self.dashboard_lb_saving_directory))
+        except TimeoutError:
+            logging.warning("Server connection lost when creating new folder ", 
+                            self.dashboard_lb_saving_directory)
+        except:
+            logging.exception("Folder ",
+                            self.dashboard_lb_saving_directory," already exist on server")
+
         date_specific_directories_list = self.get_all_subfolders(self.local_images_saving_directory)
 
-        # Check there exists a date folder on host device
+        # Check if there exists a date folder on host device
         if len(date_specific_directories_list) > 0:
 
             # The new image folders that the cameras have just captured in
@@ -245,8 +249,8 @@ class DashboardHandler:
             unsend_image_folders_list = date_specific_directories_list[:-1]
 
             # Send newest image folder to server
-            process_send_live_images = Process(target=self.send_single_folder_to_dashboard(
-                latest_date_specific_folder))
+            process_send_live_images = Process(target=self.send_single_folder_to_dashboard, args=
+                                               (latest_date_specific_folder,))
             process_send_live_images.start()
 
             # Check whether there are folders that were not send to the server in the previous run
@@ -259,9 +263,10 @@ class DashboardHandler:
             # all timestamp folders were sent successfully to the server on the previous Liftbot
             # run (as all timestamp folders would then be deleted, leaving an empty date folder). In
             # this case, the folder will be deleted
+
             if len(unsend_image_folders_list) > 0:
-                process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard(
-                    unsend_image_folders_list))
+                process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard, args=
+                                                  (unsend_image_folders_list,))
                 process_send_old_images.start()
 
             process_send_live_images.join()

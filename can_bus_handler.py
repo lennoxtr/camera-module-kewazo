@@ -16,6 +16,7 @@ Typical usage example:
 
 import os
 import can
+import logging
 
 class CanBusHandler:
     """
@@ -37,8 +38,12 @@ class CanBusHandler:
 
         """
         # Check whether the bitrate here matches RM's
-        os.system('sudo ip link set can0 type can bitrate 1000000')
-        os.system('sudo ifconfig can0 up')
+        try:
+            os.system('sudo ip link set can0 type can bitrate 1000000')
+            os.system('sudo ifconfig can0 up')
+        except:
+            logging.critical("CAN SETUP ERROR")
+
 
         can_channel = 'can0'
         can_bustype = 'socketcan'
@@ -47,7 +52,8 @@ class CanBusHandler:
             can_filters.append({"can_id": can_id, "can_mask": 0x7FF, "extended": False})
 
         can0 = can.interface.Bus(channel=can_channel, bustype=can_bustype, can_filters=can_filters)
-        print('CAN SETUP OK')
+        logging.info("CAN SETUP OK")
+
         return can0
 
     @staticmethod
@@ -56,3 +62,4 @@ class CanBusHandler:
         Disconnect CAN controller from the CAN network
         """
         os.system('sudo ifconfig can0 down')
+        logging.critical("CAN network brought down by CANBusHandler")

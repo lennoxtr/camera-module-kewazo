@@ -15,8 +15,9 @@ Typical usage example:
     central_handler.start()
 
 """
-import time
+import logging
 import threading
+import contextlib
 from multiprocessing import Process
 from can_bus_handler import CanBusHandler
 from camera_handler import CameraHandler
@@ -36,7 +37,7 @@ class CentralHandler:
     LOCAL_IMAGES_SAVING_DIRECTORY = "./images"
 
     def __init__(self, liftbot_id, ssh_pass_file_name, connection_port, dashboard_host_name,
-                 dashboard_host_ip, dashboard_images_saving_directory, rm_speed_threshold,
+                 dashboard_host_ip, dashboard_top_saving_directory, rm_speed_threshold,
                  camera_position_mapping, can_id_list_to_listen):
 
         """
@@ -52,7 +53,7 @@ class CentralHandler:
                                         connect to
             dashboard_host_name (string) : the server's host name 
             dashboard_host_ip (string) : the server's host ip
-            dashboard_images_saving_directory (string) : the top folder that contains
+            dashboard_top_saving_directory (string) : the top folder that contains
                                                     all the images on the server
             local_images_saving_directory (string) : the top folder that contains all
                                                 the images on the host device
@@ -69,13 +70,13 @@ class CentralHandler:
         """
         self.liftbot_id = liftbot_id
 
-        self.can_handler = CanBusHandler.setup_can(can_id_list_to_listen=can_id_list_to_listen)
-        self.dashboard_handler = DashboardHandler(ssh_pass_file_name=ssh_pass_file_name,
+        self.can_handler = contextlib.ExitStack().enter_context(CanBusHandler.setup_can(can_id_list_to_listen=can_id_list_to_listen))
+        self.dashboard_handler = DashboardHandler(liftbot_id=liftbot_id, ssh_pass_file_name=ssh_pass_file_name,
                                                   connection_port=connection_port,
                                                   dashboard_host_name=dashboard_host_name,
                                                   dashboard_host_ip=dashboard_host_ip,
-                                                  dashboard_images_saving_directory=
-                                                  dashboard_images_saving_directory,
+                                                  dashboard_top_saving_directory=
+                                                  dashboard_top_saving_directory,
                                                   local_images_saving_directory=
                                                   self.LOCAL_IMAGES_SAVING_DIRECTORY)
         self.camera_handler = CameraHandler(liftbot_id=liftbot_id,
@@ -83,16 +84,21 @@ class CentralHandler:
                                             self.LOCAL_IMAGES_SAVING_DIRECTORY,
                                             rm_speed_threshold=rm_speed_threshold,
                                             camera_position_mapping=camera_position_mapping)
-        print("Central Handler setup OK")
+        
+        #logging.basicConfig(filename='./log/debug.log', format='%(asctime)s %(message)s', filemode='a', level=logging.WARNING)
+        logging.info("CENTRAL HANDLER setup OK")
 
     def send_image_to_dashboard(self):
         """
         Execute Dashboard Handler to send images to server.
 
         """
-        while True:
-            if self.dashboard_handler.is_connected_to_dashboard:
+        try:
+            while True:
                 self.dashboard_handler.execute()
+        except:
+            logging.critical("Unknown Error. Cannot send to server. CAN Network possibly down")
+            return
 
     def handle_can_message(self):
         """
@@ -102,7 +108,10 @@ class CentralHandler:
 
         """
         while True:
-            msg = self.can_handler.recv()
+            try:
+                msg = self.can_handler.recv()
+            except:
+                logging.critical("Could not receive CAN message. Network down")
             # RM speed is the last 4 bytes of the CAN message
             rm_speed_as_bytes = msg.data[-4:]
 
@@ -127,6 +136,7 @@ class CentralHandler:
             process_handling_can_messages.join()
 
         except KeyboardInterrupt:
+            logging.critical("KeyboardInterrupt")
             CanBusHandler.can_down()
 
 if __name__ == "__main__":
@@ -135,18 +145,21 @@ if __name__ == "__main__":
     CONNECTION_PORT = "18538"
     DASHBOARD_HOST_NAME = "khang"
     DASHBOARD_HOST_IP = "7.tcp.eu.ngrok.io"
-    DASHBOARD_IMAGES_SAVING_DIRECTORY= "./images"
+    DASHBOARD_TOP_SAVING_DIRECTORY= "./images"
     CAMERA_POSITION_MAPPING = {0: "left", 1: "right"}
-    RM_SPEED_THRESHOLD = 50 # Speed threshold is absolute value +- 50
+    RM_SPEED_THRESHOLD = 40 # Speed threshold is absolute value +- 40
     CAN_ID_LIST_TO_LISTEN = [0x3A0]
+
+    logging.basicConfig(filename='./log/debug.log', format='%(asctime)s %(message)s', filemode='a', level=logging.WARNING)
+
 
     central_handler = CentralHandler(liftbot_id=LIFTBOT_ID,
                                      ssh_pass_file_name=SSH_PASS_FILE,
                                      connection_port=CONNECTION_PORT,
                                      dashboard_host_name=DASHBOARD_HOST_NAME,
                                      dashboard_host_ip=DASHBOARD_HOST_IP,
-                                     dashboard_images_saving_directory=
-                                     DASHBOARD_IMAGES_SAVING_DIRECTORY,
+                                     dashboard_top_saving_directory=
+                                     DASHBOARD_TOP_SAVING_DIRECTORY,
                                      rm_speed_threshold=RM_SPEED_THRESHOLD,
                                      camera_position_mapping=CAMERA_POSITION_MAPPING,
                                      can_id_list_to_listen=CAN_ID_LIST_TO_LISTEN)
