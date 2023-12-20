@@ -13,21 +13,24 @@ The structure of folders to save images on the server is as follows:
 |
 |_ Top directory to save image on server (Example: /images)
         |
-        |_ Date specific saving folder (Example: /230717, denoting 17 July 2023)
+        |_ Liftbot ID (Example: LB1)
                 |
-                |_ Timestamp saving folder (Example: /130450, denoting 1:04:50 PM)
+                |_ Date specific saving folder (Example: /230717, denoting 17 July 2023)
                         |
-                        |_ Image 1
-                        |
-                        |_ Image 2
-                        |
-                        |_ ...
+                        |_ Timestamp saving folder (Example: /130450, denoting 1:04:50 PM)
+                                |
+                                |_ Image 1
+                                |
+                                |_ Image 2
+                                |
+                                |_ ...
 
 
 Typical usage example:
-    dashboard_handler = DashboardHandler(ssh_pass_file_name, connection_port,
+    dashboard_handler = DashboardHandler(liftbot_id,
+                                        ssh_pass_file_name, connection_port,
                                         dashboard_host_name, dashboard_host_ip,
-                                        dashboard_images_saving_directory,
+                                        dashboard_top_saving_directory,
                                         local_images_saving_directory)
     dashboard_handler.execute()
 
@@ -50,33 +53,36 @@ class DashboardHandler:
     folder on the host device.
 
     """
-    SEND_TO_DASHBOARD_COMMAND = "rsync -arq -P --append -e 'sshpass -f {ssh_pass_file_name} ssh -q -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
+    SEND_TO_DASHBOARD_COMMAND = "rsync -ar --timeout=5 -q -P --append -e 'sshpass -f {ssh_pass_file_name} ssh -q -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
     CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -p {connection_port} -o StrictHostKeyChecking=no 'mkdir -p {dashboard_folder_directory}'"
 
-    def __init__(self, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
-                 dashboard_images_saving_directory, local_images_saving_directory):
+    def __init__(self, liftbot_id, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
+                 dashboard_top_saving_directory, local_images_saving_directory):
         """
         Initialize the DashboardHandler with the appropriate information to connect to the server.
 
         Args:
+            liftbot_id (string) : an ID to differentiate between multiple Liftbots 
+                            to know which Liftbot the camera belongs to
             ssh_pass_file_name (.txt) : a file that contains the ssh password to connect to
                                         the server
             connection_port (int) : a number to indicate which port on the server to
                                         connect to
             dashboard_host_name (string) : the server's host name 
             dashboard_host_ip (string) : the server's host ip
-            dashboard_images_saving_directory (string) : the top folder that contains all the
-                                                        images on the server
+            dashboard_top_saving_directory (string) : the top folder that contains all the
+                                                        images of all liftbots on the server
             local_images_saving_directory : the top folder that contains all the
                                             images on the host device
 
         """
 
+        self.liftbot_id = liftbot_id
         self.ssh_pass_file_name = ssh_pass_file_name
         self.connection_port = connection_port
         self.dashboard_host_name = dashboard_host_name
         self.dashboard_host_ip = dashboard_host_ip
-        self.dashboard_images_saving_directory = dashboard_images_saving_directory
+        self.dashboard_lb_saving_directory = os.path.join(dashboard_top_saving_directory, liftbot_id)
         self.local_images_saving_directory = local_images_saving_directory
 
     def get_all_subfolders(self, local_folder_directory):
@@ -134,7 +140,7 @@ class DashboardHandler:
 
         else:
             dashboard_date_folder_directory = os.path.join(
-                self.dashboard_images_saving_directory, date_specific_folder)
+                self.dashboard_lb_saving_directory, date_specific_folder)
             try:
                 # Create a new folder on the server with the same name as the date folder if it
                 # doesn't exist
@@ -195,6 +201,18 @@ class DashboardHandler:
         the curent run, to the server. This is done via process-based parallelism
 
         """
+
+        # Create a Liftbot-specific folder (Example: /images/LB1) on the server if it
+        # doesn't exist 
+        try:
+            os.system(self.CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND.format(
+                ssh_pass_file_name=self.ssh_pass_file_name,
+                dashboard_host_name=self.dashboard_host_name,
+                dashboard_host_ip=self.dashboard_host_ip,
+                connection_port=self.connection_port,
+                dashboard_folder_directory=self.dashboard_lb_saving_directory))
+        except FileExistsError:
+            print("Folder already exist")
 
         date_specific_directories_list = self.get_all_subfolders(self.local_images_saving_directory)
 
