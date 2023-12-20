@@ -85,7 +85,7 @@ class CentralHandler:
                                             rm_speed_threshold=rm_speed_threshold,
                                             camera_position_mapping=camera_position_mapping)
         
-        logging.basicConfig(filename='./log/debug.log', filemode='a', level=logging.WARNING)
+        logging.basicConfig(filename='./log/debug.log', format='%(asctime)s %(message)s', filemode='a', level=logging.WARNING)
         logging.info("CENTRAL HANDLER setup OK")
 
     def send_image_to_dashboard(self):
@@ -93,8 +93,11 @@ class CentralHandler:
         Execute Dashboard Handler to send images to server.
 
         """
-        while True:
-            self.dashboard_handler.execute()
+        try:
+            while True:
+                self.dashboard_handler.execute()
+        except:
+            logging.exception("Unknown Error when sending to server")
 
     def handle_can_message(self):
         """
@@ -105,9 +108,9 @@ class CentralHandler:
         """
         while True:
             try:
-                 msg = self.can_handler.recv()
+                msg = self.can_handler.recv()
             except:
-                 logging.critical("Could not receive CAN message. Network down")
+                logging.critical("Could not receive CAN message. Network down")
             # RM speed is the last 4 bytes of the CAN message
             rm_speed_as_bytes = msg.data[-4:]
 

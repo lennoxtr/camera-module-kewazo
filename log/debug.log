@@ -1,9 +1,0 @@
-WARNING:can.bus:SocketcanBus was not properly shut down
-WARNING:can.bus:SocketcanBus was not properly shut down
-CRITICAL:root:CAN network down
-CRITICAL:root:CAN network down
-CRITICAL:root:CAN network down
-CRITICAL:root:Could not receive CAN message. Network down
-CRITICAL:root:CAN network down
-CRITICAL:root:Could not receive CAN message. Network down
-CRITICAL:root:CAN network down

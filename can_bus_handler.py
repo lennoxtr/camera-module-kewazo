@@ -37,8 +37,6 @@ class CanBusHandler:
             can.interface.Bus : a CAN object.
 
         """
-        logging.basicConfig(filename='./log/debug.log', filemode='a', level=logging.WARNING)
-
         # Check whether the bitrate here matches RM's
         try:
             os.system('sudo ip link set can0 type can bitrate 1000000')
