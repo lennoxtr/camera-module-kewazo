@@ -31,14 +31,40 @@ git clone https://github.com/lennoxtr/camera-module-kewazo.git/tree/{branch}
 ```
 pip -r install requirements.txt
 ``` 
-3. Connect hardware components. Refer to [Electrical Architecture](#electrical-architecture) for more details
-4. Run the script on the host device
+3. Create a log folder for error log
+```
+mkdir log
+``` 
+4. Connect hardware components. Refer to [Electrical Architecture](#electrical-architecture) for more details
+5. Run the script on the host device
 ```
 sudo python3 central_handler.py
 ```
 $~~~~~~~~~$ If running simulation, run the script on the simulating device
 ```
 sudo python3 rm_speed_simulation.py
+```
+
+## Start script automatically when powered on
+1. Create an appropriate service that starts after network connection is establish
+2. Create a bash file to run the script
+3. Reload daemon
+```
+sudo systemctl daemon-reload
+```
+4. Enable service
+5. Reboot device
+```
+sudo reboot
+```
+
+## Debugging
+### Setup dynamic update of host device's IP address
+
+### Debugging during running
+1. Check log file for warning and error logs:
+```
+cat log/debug.log
 ```
 
 ## Electrical Architecture
