@@ -280,7 +280,8 @@ class CameraHandler:
         # The RM status will also be updated to 1 (moving).
 
         if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 210
-            and self.rm_status == 0 and speed_diff < 100):
+            and self.rm_status == 0 and speed_diff < 90):
+
             self.process_images()
             logging.info("Taking photos")
             self.rm_status = 1

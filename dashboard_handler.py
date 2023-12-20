@@ -54,6 +54,7 @@ class DashboardHandler:
     folder on the host device.
 
     """
+
     SEND_TO_DASHBOARD_COMMAND = "rsync -ar --timeout=5 -q -P --append -e 'sshpass -f {ssh_pass_file_name} ssh -q -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
     CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -p {connection_port} -o StrictHostKeyChecking=no 'mkdir -p {dashboard_folder_directory}'"
 
