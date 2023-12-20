@@ -54,8 +54,7 @@ class DashboardHandler:
     folder on the host device.
 
     """
-
-    SEND_TO_DASHBOARD_COMMAND = "rsync -ar --timeout=5 -q -P --append -e 'sshpass -f {ssh_pass_file_name} ssh -q -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
+    SEND_TO_DASHBOARD_COMMAND = "rsync -ar --timeout=7 -q -P --append -e 'sshpass -f {ssh_pass_file_name} ssh -q -p {connection_port} -o StrictHostKeyChecking=no' {local_image_folder_directory} {dashboard_host_name}@{dashboard_host_ip}:{dashboard_directory_to_send}"
     CREATE_NEW_FOLDER_ON_DASHBOARD_COMMAND = "sshpass -f {ssh_pass_file_name} ssh {dashboard_host_name}@{dashboard_host_ip} -p {connection_port} -o StrictHostKeyChecking=no 'mkdir -p {dashboard_folder_directory}'"
 
     def __init__(self, liftbot_id, ssh_pass_file_name, connection_port, dashboard_host_name, dashboard_host_ip,
@@ -86,7 +85,6 @@ class DashboardHandler:
         self.dashboard_host_ip = dashboard_host_ip
         self.dashboard_lb_saving_directory = os.path.join(dashboard_top_saving_directory, liftbot_id)
         self.local_images_saving_directory = local_images_saving_directory
-        logging.basicConfig(filename='./log/debug.log', filemode='a', level=logging.WARNING)
 
 
     def get_all_subfolders(self, local_folder_directory):
@@ -182,9 +180,8 @@ class DashboardHandler:
                     
                     # Remove the timestamp folder on the host device if it was successfully
                     # sent to the server
-                    if os.path.isdir(subfolder_local_directory):
-                        shutil.rmtree(subfolder_local_directory)
-                        logging.info("Folder ", subfolder_local_directory,
+                    shutil.rmtree(subfolder_local_directory)
+                    logging.info("Folder ", subfolder_local_directory,
                                  " sent to server and removed from local host")
                 except TimeoutError:
                     logging.warning("Server connection lost when sending image folder ",
