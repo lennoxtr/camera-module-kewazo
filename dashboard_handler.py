@@ -181,8 +181,9 @@ class DashboardHandler:
                     
                     # Remove the timestamp folder on the host device if it was successfully
                     # sent to the server
-                    shutil.rmtree(subfolder_local_directory)
-                    logging.info("Folder ", subfolder_local_directory,
+                    if os.path.isdir(subfolder_local_directory):
+                        shutil.rmtree(subfolder_local_directory)
+                        logging.info("Folder ", subfolder_local_directory,
                                  " sent to server and removed from local host")
                 except TimeoutError:
                     logging.warning("Server connection lost when sending image folder ",

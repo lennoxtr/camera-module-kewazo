@@ -62,4 +62,4 @@ class CanBusHandler:
         Disconnect CAN controller from the CAN network
         """
         os.system('sudo ifconfig can0 down')
-        logging.critical("CAN network down")
+        logging.critical("CAN network brought down by CANBusHandler")

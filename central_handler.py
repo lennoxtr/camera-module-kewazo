@@ -85,7 +85,7 @@ class CentralHandler:
                                             rm_speed_threshold=rm_speed_threshold,
                                             camera_position_mapping=camera_position_mapping)
         
-        logging.basicConfig(filename='./log/debug.log', format='%(asctime)s %(message)s', filemode='a', level=logging.WARNING)
+        #logging.basicConfig(filename='./log/debug.log', format='%(asctime)s %(message)s', filemode='a', level=logging.WARNING)
         logging.info("CENTRAL HANDLER setup OK")
 
     def send_image_to_dashboard(self):
@@ -97,7 +97,8 @@ class CentralHandler:
             while True:
                 self.dashboard_handler.execute()
         except:
-            logging.exception("Unknown Error when sending to server")
+            logging.critical("Unknown Error. Cannot send to server. CAN Network possibly down")
+            return
 
     def handle_can_message(self):
         """
@@ -135,6 +136,7 @@ class CentralHandler:
             process_handling_can_messages.join()
 
         except KeyboardInterrupt:
+            logging.critical("KeyboardInterrupt")
             CanBusHandler.can_down()
 
 if __name__ == "__main__":
@@ -145,8 +147,11 @@ if __name__ == "__main__":
     DASHBOARD_HOST_IP = "7.tcp.eu.ngrok.io"
     DASHBOARD_TOP_SAVING_DIRECTORY= "./images"
     CAMERA_POSITION_MAPPING = {0: "left", 1: "right"}
-    RM_SPEED_THRESHOLD = 50 # Speed threshold is absolute value +- 50
+    RM_SPEED_THRESHOLD = 40 # Speed threshold is absolute value +- 40
     CAN_ID_LIST_TO_LISTEN = [0x3A0]
+
+    logging.basicConfig(filename='./log/debug.log', format='%(asctime)s %(message)s', filemode='a', level=logging.WARNING)
+
 
     central_handler = CentralHandler(liftbot_id=LIFTBOT_ID,
                                      ssh_pass_file_name=SSH_PASS_FILE,
