@@ -15,7 +15,7 @@ Typical usage example:
     central_handler.start()
 
 """
-import time
+import logging
 import threading
 from multiprocessing import Process
 from can_bus_handler import CanBusHandler
@@ -83,7 +83,9 @@ class CentralHandler:
                                             self.LOCAL_IMAGES_SAVING_DIRECTORY,
                                             rm_speed_threshold=rm_speed_threshold,
                                             camera_position_mapping=camera_position_mapping)
-        print("Central Handler setup OK")
+        
+        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.WARNING)
+        logging.info("CENTRAL HANDLER setup OK")
 
     def send_image_to_dashboard(self):
         """

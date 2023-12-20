@@ -13,7 +13,7 @@ The structure of folders to save images on the server is as follows:
 |
 |_ Top directory to save image on server (Example: /images)
         |
-        |_ Liftbot ID (Example: LB1)
+        |_ Liftbot ID folder (Example: /LB1)
                 |
                 |_ Date specific saving folder (Example: /230717, denoting 17 July 2023)
                         |
@@ -40,6 +40,7 @@ import os
 import datetime
 import time
 import shutil
+import logging
 from multiprocessing import Process, Pool
 
 class DashboardHandler:
@@ -84,6 +85,8 @@ class DashboardHandler:
         self.dashboard_host_ip = dashboard_host_ip
         self.dashboard_lb_saving_directory = os.path.join(dashboard_top_saving_directory, liftbot_id)
         self.local_images_saving_directory = local_images_saving_directory
+        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.WARNING)
+
 
     def get_all_subfolders(self, local_folder_directory):
         """
@@ -137,6 +140,8 @@ class DashboardHandler:
 
         if len(timestamp_folders_to_send) == 0 and current_date != date_specific_folder:
             shutil.rmtree(date_specific_folder_local_directory)
+            logging.info("Removed folder ", date_specific_folder_local_directory,
+                          " from local host. Folder from previous date")
 
         else:
             dashboard_date_folder_directory = os.path.join(
@@ -151,7 +156,12 @@ class DashboardHandler:
                     connection_port=self.connection_port,
                     dashboard_folder_directory=dashboard_date_folder_directory))
             except FileExistsError:
-                print("Date specific folder already exist on dashboard")
+                logging.warning("Folder ", dashboard_date_folder_directory, " already exist on server")
+            except TimeoutError:
+                logging.warning("Server connection lost when creating folder ",
+                                dashboard_date_folder_directory)
+            except:
+                logging.exception("Unknown Error when creating new date folder on server")
             # Send all timestamp folders under the date folder to the server
             for timestamp_folder in timestamp_folders_to_send:
                 subfolder_local_directory = os.path.join(
@@ -172,8 +182,14 @@ class DashboardHandler:
                     # Remove the timestamp folder on the host device if it was successfully
                     # sent to the server
                     shutil.rmtree(subfolder_local_directory)
+                    logging.info("Folder ", subfolder_local_directory,
+                                 " sent to server and removed from local host")
                 except TimeoutError:
+                    logging.warning("Server connection lost when sending image folder ",
+                                    subfolder_local_directory)
                     continue
+                except:
+                    logging.exception("Unknown Error when sending images to server")
 
     def send_multiple_folders_to_dashboard(self, local_image_folder_list):
         """
@@ -211,12 +227,16 @@ class DashboardHandler:
                 dashboard_host_ip=self.dashboard_host_ip,
                 connection_port=self.connection_port,
                 dashboard_folder_directory=self.dashboard_lb_saving_directory))
-        except FileExistsError:
-            print("Folder already exist")
+        except TimeoutError:
+            logging.warning("Server connection lost when creating new folder ", 
+                            self.dashboard_lb_saving_directory)
+        except:
+            logging.exception("Folder ",
+                            self.dashboard_lb_saving_directory," already exist on server")
 
         date_specific_directories_list = self.get_all_subfolders(self.local_images_saving_directory)
 
-        # Check there exists a date folder on host device
+        # Check if there exists a date folder on host device
         if len(date_specific_directories_list) > 0:
 
             # The new image folders that the cameras have just captured in
@@ -227,8 +247,8 @@ class DashboardHandler:
             unsend_image_folders_list = date_specific_directories_list[:-1]
 
             # Send newest image folder to server
-            process_send_live_images = Process(target=self.send_single_folder_to_dashboard(
-                latest_date_specific_folder))
+            process_send_live_images = Process(target=self.send_single_folder_to_dashboard, args=
+                                               (latest_date_specific_folder,))
             process_send_live_images.start()
 
             # Check whether there are folders that were not send to the server in the previous run
@@ -243,8 +263,8 @@ class DashboardHandler:
             # this case, the folder will be deleted
 
             if len(unsend_image_folders_list) > 0:
-                process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard(
-                    unsend_image_folders_list))
+                process_send_old_images = Process(target=self.send_multiple_folders_to_dashboard, args=
+                                                  (unsend_image_folders_list,))
                 process_send_old_images.start()
 
             process_send_live_images.join()

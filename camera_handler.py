@@ -49,6 +49,7 @@ import contextlib
 import datetime
 import time
 import cv2
+import logging
 import depthai as dai
 
 class Camera:
@@ -84,6 +85,7 @@ class Camera:
         self.camera_name = camera_name
         self.oak_device_info = oak_device_info
         self.oak_device_pipeline = oak_device_pipeline
+        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.DEBUG)
 
     def process_image(self, context_manager, timestamp_saving_directory, date, timestamp):
         """
@@ -102,8 +104,16 @@ class Camera:
         """
 
         # Initialize Device object with a specified pipeline
-        oak_device : dai.Device = context_manager.enter_context(dai.Device(self.oak_device_info))
-        oak_device.startPipeline(self.oak_device_pipeline)
+        try:
+            oak_device : dai.Device = context_manager.enter_context(dai.Device(self.oak_device_info))
+            logging.info("Camera initialized")
+        except:
+            logging.exception("Error when initialization camera ", self.camera_name)
+        try:
+            oak_device.startPipeline(self.oak_device_pipeline)
+            logging.info("Start pipeline on camera ", self.camera_name)
+        except:
+            logging.exception("Cannot start pipeline on camera ", self.camera_name)
 
         # Define an input queue to send capture image event to Depthai device
         # maxSize=1 and blocking=False means that only the latest capture event is in the queue
@@ -121,6 +131,7 @@ class Camera:
 
         # Send capture event to depthai device to capture 1 image
         input_control_queue.send(ctrl)
+        logging.info("Send capture command to camera ", self.camera_name)
 
         # Time delay to make sure that the capture event is received
         time.sleep(0.5)
@@ -133,9 +144,14 @@ class Camera:
 
         image_file_directory = os.path.join(timestamp_saving_directory, image_file_name)
 
+
+
         if image_output_queue.has():
             frame = image_output_queue.get().getCvFrame()
-            cv2.imwrite(image_file_directory, frame)
+            if cv2.imwrite(image_file_directory, frame):
+                logging.info(self.camera_name, " SAVED")
+            else:
+                logging.debug(self.camera_name, " NOT SAVED")
         else:
             return
 
@@ -199,6 +215,7 @@ class CameraHandler:
                                    oak_device_pipeline=oak_device_pipeline)
                 self.kewazo_camera_object_list.append(kewazo_camera_object)
                 camera_id += 1
+        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.DEBUG)
 
     def set_depthai_common_pipeline(self):
         """
@@ -267,6 +284,7 @@ class CameraHandler:
         if (speed_diff > self.rm_speed_threshold and abs(rm_speed) < 210
             and self.rm_status == 0 and speed_diff < 100):
             self.process_images()
+            logging.info("Taking photos")
             self.rm_status = 1
 
         # If the RM speed is normal (abs(rm_speed) < 400000 and abs(rm_speed) < 400000 > 40), the
