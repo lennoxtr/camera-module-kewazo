@@ -215,7 +215,7 @@ class CameraHandler:
                                    oak_device_pipeline=oak_device_pipeline)
                 self.kewazo_camera_object_list.append(kewazo_camera_object)
                 camera_id += 1
-        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.DEBUG)
+        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.WARNING)
 
     def set_depthai_common_pipeline(self):
         """
