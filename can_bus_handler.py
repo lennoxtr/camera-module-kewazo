@@ -37,7 +37,7 @@ class CanBusHandler:
             can.interface.Bus : a CAN object.
 
         """
-        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.WARNING)
+        logging.basicConfig(filename='./log/debug.log', filemode='a', level=logging.WARNING)
 
         # Check whether the bitrate here matches RM's
         try:

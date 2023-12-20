@@ -85,7 +85,7 @@ class DashboardHandler:
         self.dashboard_host_ip = dashboard_host_ip
         self.dashboard_lb_saving_directory = os.path.join(dashboard_top_saving_directory, liftbot_id)
         self.local_images_saving_directory = local_images_saving_directory
-        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.WARNING)
+        logging.basicConfig(filename='./log/debug.log', filemode='a', level=logging.WARNING)
 
 
     def get_all_subfolders(self, local_folder_directory):

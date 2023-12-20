@@ -85,7 +85,7 @@ class Camera:
         self.camera_name = camera_name
         self.oak_device_info = oak_device_info
         self.oak_device_pipeline = oak_device_pipeline
-        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.DEBUG)
+        logging.basicConfig(filename='./log/debug.log', filemode='a', level=logging.DEBUG)
 
     def process_image(self, context_manager, timestamp_saving_directory, date, timestamp):
         """
@@ -215,7 +215,7 @@ class CameraHandler:
                                    oak_device_pipeline=oak_device_pipeline)
                 self.kewazo_camera_object_list.append(kewazo_camera_object)
                 camera_id += 1
-        logging.basicConfig(filename='debug.log', encoding='utf-8', filemode='a', level=logging.WARNING)
+        logging.basicConfig(filename='./log/debug.log', filemode='a', level=logging.WARNING)
 
     def set_depthai_common_pipeline(self):
         """
