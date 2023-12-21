@@ -188,7 +188,8 @@ class DashboardHandler:
                                     subfolder_local_directory)
                     continue
                 except Exception:
-                    logging.exception("Unknown Error when sending images to server")
+                    logging.exception("Unknown Error when sending images to server. Check network connection")
+                    continue
 
     def send_multiple_folders_to_dashboard(self, local_image_folder_list):
         """
