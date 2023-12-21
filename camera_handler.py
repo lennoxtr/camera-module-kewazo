@@ -63,7 +63,7 @@ class Camera:
     
     """
     IMAGE_NAMING = "{liftbot_id}_{camera_name}_{date}_{timestamp}.jpg"
-    BRIGHTNESS_LOW = 85 # Threshold to determine whether image is too dark
+    BRIGHTNESS_LOW = 80 # Threshold to determine whether image is too dark
     BRIGHTNESS_HIGH = 90 # Threshold to determine whether image is too bright
     GAMMA_ADJUSTMENT_STEP = 0.05 # Exposure step to adjust camera exposure
 
