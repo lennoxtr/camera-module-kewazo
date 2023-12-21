@@ -159,7 +159,7 @@ class DashboardHandler:
             except TimeoutError:
                 logging.warning("Server connection lost when creating folder ",
                                 dashboard_date_folder_directory)
-            except:
+            except Exception:
                 logging.exception("Unknown Error when creating new date folder on server")
             # Send all timestamp folders under the date folder to the server
             for timestamp_folder in timestamp_folders_to_send:
@@ -187,7 +187,7 @@ class DashboardHandler:
                     logging.warning("Server connection lost when sending image folder ",
                                     subfolder_local_directory)
                     continue
-                except:
+                except Exception:
                     logging.exception("Unknown Error when sending images to server")
 
     def send_multiple_folders_to_dashboard(self, local_image_folder_list):
@@ -202,7 +202,6 @@ class DashboardHandler:
                                                     (Ex: /images) on the host device
 
         """
-
         with Pool() as p:
             p.map(self.send_single_folder_to_dashboard, local_image_folder_list)
 
@@ -227,10 +226,10 @@ class DashboardHandler:
                 connection_port=self.connection_port,
                 dashboard_folder_directory=self.dashboard_lb_saving_directory))
         except TimeoutError:
-            logging.warning("Server connection lost when creating new folder ", 
+            logging.critical("Server connection lost when creating new folder ", 
                             self.dashboard_lb_saving_directory)
-        except:
-            logging.exception("Folder ",
+        except Exception:
+            logging.critical("Folder ",
                             self.dashboard_lb_saving_directory," already exist on server")
 
         date_specific_directories_list = self.get_all_subfolders(self.local_images_saving_directory)

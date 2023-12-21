@@ -41,7 +41,7 @@ class CanBusHandler:
         try:
             os.system('sudo ip link set can0 type can bitrate 1000000')
             os.system('sudo ifconfig can0 up')
-        except:
+        except Exception:
             logging.critical("CAN SETUP ERROR")
 
 

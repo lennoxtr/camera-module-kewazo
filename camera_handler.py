@@ -111,12 +111,12 @@ class Camera:
         try:
             oak_device : dai.Device = context_manager.enter_context(dai.Device(self.oak_device_info))
             logging.info("Camera initialized")
-        except:
+        except Exception:
             logging.exception("Error when initialization camera ", self.camera_name)
         try:
             oak_device.startPipeline(self.oak_device_pipeline)
             logging.info("Start pipeline on camera ", self.camera_name)
-        except:
+        except Exception:
             logging.exception("Cannot start pipeline on camera ", self.camera_name)
 
         # Define an input queue to send capture image event to Depthai device
@@ -175,7 +175,7 @@ class Camera:
             if cv2.imwrite(image_file_directory, frame):
                 logging.info(self.camera_name, " SAVED")
             else:
-                logging.debug(self.camera_name, " NOT SAVED")
+                logging.critical(self.camera_name, " NOT SAVED")
         else:
             return
     
@@ -287,8 +287,11 @@ class CameraHandler:
 
         """
         saving_directory = os.path.join(parent_directory, new_folder_name)
-        if not os.path.exists(saving_directory):
-            os.makedirs(saving_directory)
+        try:
+            if not os.path.exists(saving_directory):
+                os.makedirs(saving_directory)
+        except Exception:
+            logging.critical("No permission to create folder")
         return saving_directory
 
     def execute(self, rm_speed):
