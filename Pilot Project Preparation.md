@@ -1,4 +1,4 @@
-# Project Preparation
+# Pilot Project Preparation
 * Here's a guide to prepare the camera system for pilot project.
 (These steps assume that you are using the original RPi 4 host device)
 * The password for RPi and server can be found on Asana
