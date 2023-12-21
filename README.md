@@ -27,16 +27,18 @@ Currently, the system supports [OAK-1 Lite](https://shop.luxonis.com/products/oa
 ```
 git clone https://github.com/lennoxtr/camera-module-kewazo.git/tree/{branch}
 ```
-2. Install dependencies on host device
+3. Navigate into the cloned folder, create a folder for images and error log
+```
+mkdir images
+
+mkdir log
+```
+4. Install dependencies on host device
 ```
 pip -r install requirements.txt
 ``` 
-3. Create a log folder for error log
-```
-mkdir log
-``` 
-4. Connect hardware components. Refer to [Electrical Architecture](#electrical-architecture) for more details
-5. Run the script on the host device
+5. Connect hardware components. Refer to [Electrical Architecture](#electrical-architecture) for more details
+6. Run the script on the host device
 ```
 sudo python3 central_handler.py
 ```
@@ -47,20 +49,124 @@ sudo python3 rm_speed_simulation.py
 
 ## Start script automatically when powered on
 1. Create an appropriate service that starts after network connection is establish
-2. Create a bash file to run the script
-3. Reload daemon
+```
+sudo nano /etc/systemd/system/upload-tp-image.service
+```
+2. Enter the following into the file, which will run the bash script that runs the Python script.
+Change {host_device_name} to actual host device name
+```
+[Unit]
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/home/{host_device_name}/ip2aws.bash
+
+[Install]
+WantedBy=multi-user.target
+
+```
+3. Create a bash file to run the script
+```
+sudo nano ~/home/{host_device_name}/upload-tp-image.bash
+```
+4. Enter the following into the file
+```
+#!/bin/bash
+
+cd {path_to_folder_containing script}
+
+sudo python3 {path_to_folder_containing_script}/central_handler.py
+```
+5. Change permissions of the files
+```
+sudo chmod 744 ~/home/{host_device_name}/upload-tp-image.bash
+
+sudo chmod 664 /etc/systemd/system/upload-tp-image.service
+```
+6. Verify that the bash file can run correctly
+```
+. ~/home/{host_device_name}/upload-tp-image.bash
+```
+7. Reload daemon
 ```
 sudo systemctl daemon-reload
 ```
-4. Enable service
-5. Reboot device
+8. Enable service
+```
+sudo systemctl enable /etc/systemd/system/upload-tp-image.service
+```
+9. Reboot device
 ```
 sudo reboot
 ```
 
 ## Debugging
-### Setup dynamic update of host device's IP address
+### Settinng up dynamic update of host device's IP address
+1. Create an appropriate service that starts after network connection is establish
+network connection is establish
+```
+sudo nano /etc/systemd/system/ip2server.service
+```
 
+2. Enter the following into the file, which will run the bash script that update the IP address.
+Change {host_device_name} to actual host device name
+
+```
+[Unit]
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/home/{host_device_name}/ipserver.bash
+
+[Install]
+WantedBy=multi-user.target
+
+```
+
+3. Create a bash file to run the script
+```
+sudo nano ~/home/{host_device_name}/ip2server.bash
+```
+4. Enter the following into the file
+```
+#!/bin/bash
+
+sudo python3 {path_to_folder_containing script}/central_handler.py
+```
+5. Change permissions of the files
+```
+sudo chmod 744 ~/home/{host_device_name}/ip2server.bash
+
+sudo chmod 664 /etc/systemd/system/ip2server.service 
+
+```
+6. Verify that the bash file can run correctly
+```
+. ~/home/{host_device_name}/ip2server.bash
+```
+$~~~~~~~~~$ Log on to server, navigate to cam_ip to check IP address
+```
+ssh khang@7.tcp.eu.ngrok.io -p 18538
+
+cat cam_ip/rpi1.txt
+```
+
+7. Reload daemon
+```
+sudo systemctl daemon-reload
+```
+8. Enable service
+```
+sudo systemctl enable /etc/systemd/system/ip2server.service
+```
+9. Reboot device
+```
+sudo reboot
+```
 ### Debugging during running
 1. Check log file for warning and error logs:
 ```
