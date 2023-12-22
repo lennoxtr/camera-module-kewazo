@@ -53,6 +53,7 @@ import numpy as np
 from numpy.linalg import norm
 import logging
 import depthai as dai
+import shutil
 
 class Camera:
     """
@@ -90,6 +91,7 @@ class Camera:
         self.oak_device_info = oak_device_info
         self.oak_device_pipeline = oak_device_pipeline
         self.gamma = 1.0
+        self.brightness_control = 0
 
     def process_image(self, context_manager, timestamp_saving_directory, date, timestamp):
         """
@@ -131,6 +133,7 @@ class Camera:
 
         # Define capture event for depthai_device
         ctrl = dai.CameraControl()
+        ctrl.setBrightness(self.brightness_control)
         ctrl.setCaptureStill(True)
 
         # Send capture event to depthai device to capture 1 image
@@ -154,8 +157,23 @@ class Camera:
             # different lighting environments.
             
             brightness = np.average(norm(frame, axis=2)) / np.sqrt(3)
+            if brightness > 130 or brightness < 40:
+                if brightness > 130:
+                    self.brightness_control -= 1
+                    try:
+                        shutil.rmtree(timestamp_saving_directory)
+                    except Exception:
+                        return
+                    return
+                elif brightness < 40:
+                    self.brightness_control += 1
+                    try:
+                        shutil.rmtree(timestamp_saving_directory)
+                    except Exception:
+                        return
+                    return
             counter = 0
-            while (counter < 15) and (brightness > self.BRIGHTNESS_HIGH or brightness < self.BRIGHTNESS_LOW):
+            while (counter < 10) and (brightness > self.BRIGHTNESS_HIGH or brightness < self.BRIGHTNESS_LOW):
                 # Adjusting gamma values
                 if brightness > self.BRIGHTNESS_HIGH:
                     logging.warning(self.camera_name,

@@ -160,7 +160,7 @@ if __name__ == "__main__":
     DASHBOARD_HOST_IP = "7.tcp.eu.ngrok.io"
     DASHBOARD_TOP_SAVING_DIRECTORY= "./images"
     CAMERA_POSITION_MAPPING = {0: "left", 1: "right"}
-    RM_SPEED_THRESHOLD = 40 # Speed threshold is absolute value +- 40
+    RM_SPEED_THRESHOLD = 60 # Speed threshold is absolute value +- 60
     CAN_ID_LIST_TO_LISTEN = [0x3A0] # Add more if needed
 
     logging.basicConfig(filename='./log/debug.log', format='%(asctime)s %(message)s', filemode='a', level=logging.WARNING)
