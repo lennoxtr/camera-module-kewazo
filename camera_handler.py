@@ -90,8 +90,8 @@ class Camera:
         self.camera_name = camera_name
         self.oak_device_info = oak_device_info
         self.oak_device_pipeline = oak_device_pipeline
-        self.gamma = 1.0
-        self.brightness_control = 0
+        self.gamma = 1.0 # Default of DepthAI camera
+        self.brightness_control = 0 # Default of DepthAI camera
 
     def process_image(self, context_manager, timestamp_saving_directory, date, timestamp):
         """
@@ -161,7 +161,7 @@ class Camera:
                 if brightness > 130:
                     self.brightness_control -= 1
                     try:
-                        shutil.rmtree(image_file_directory)
+                        shutil.rmtree(timestamp_saving_directory)
                     except Exception:
                         return
                     return
