@@ -299,6 +299,7 @@ class CameraHandler:
 
         # Define a Color Camera Node for getting image frames from camera
         cam_rgb = pipeline.create(dai.node.ColorCamera)
+        cam_rgb.setFps(10) # Lower FPS to increase exposure range
 
         # Define xLinkIn node for receiving capture image event from host device
         xin_still = pipeline.create(dai.node.XLinkIn)
