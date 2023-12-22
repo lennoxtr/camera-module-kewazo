@@ -165,8 +165,8 @@ class DashboardHandler:
             for timestamp_folder in timestamp_folders_to_send:
                 subfolder_local_directory = os.path.join(
                     date_specific_folder_local_directory, timestamp_folder)
-                if len(os.listdir(subfolder_local_directory)) == 0:
-                    return
+                if len(os.listdir(subfolder_local_directory)) < 2:
+                    continue
                 try:
                     os.system(self.SEND_TO_DASHBOARD_COMMAND.format(
                         ssh_pass_file_name=self.ssh_pass_file_name,

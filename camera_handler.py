@@ -63,9 +63,9 @@ class Camera:
     
     """
     IMAGE_NAMING = "{liftbot_id}_{camera_name}_{date}_{timestamp}.jpg"
-    BRIGHTNESS_LOW = 80 # Threshold to determine whether image is too dark
+    BRIGHTNESS_LOW = 70 # Threshold to determine whether image is too dark
     BRIGHTNESS_HIGH = 90 # Threshold to determine whether image is too bright
-    GAMMA_ADJUSTMENT_STEP = 0.05 # Exposure step to adjust camera exposure
+    GAMMA_ADJUSTMENT_STEP = 0.01 # Exposure step to adjust camera exposure
 
     def __init__(self, liftbot_id, camera_name, oak_device_info, oak_device_pipeline):
         """
@@ -150,12 +150,12 @@ class Camera:
 
         if image_output_queue.has():
             frame = image_output_queue.get().getCvFrame()
-
             # Analyze brightness of image to adjust camera exposure for
             # different lighting environments.
+            
             brightness = np.average(norm(frame, axis=2)) / np.sqrt(3)
-
-            while brightness > self.BRIGHTNESS_HIGH or brightness < self.BRIGHTNESS_LOW:
+            counter = 0
+            while (counter < 15) and (brightness > self.BRIGHTNESS_HIGH or brightness < self.BRIGHTNESS_LOW):
                 # Adjusting gamma values
                 if brightness > self.BRIGHTNESS_HIGH:
                     logging.warning(self.camera_name,
@@ -167,11 +167,12 @@ class Camera:
                                 " BRIGHTNESS TOO LOW. DECREASING GAMMA")
                     self.gamma -= self.GAMMA_ADJUSTMENT_STEP
                     frame = self.gamma_correction(frame, self.gamma)
-                brightness = np.average(norm(frame, axis=2)) / np.sqrt(3) 
+                brightness = np.average(norm(frame, axis=2)) / np.sqrt(3)
+                counter += 1
             
             logging.info(self.camera_name,
                                 " BRIGHTNESS WITHIN THRESHOLD")
-                
+            
             if cv2.imwrite(image_file_directory, frame):
                 logging.info(self.camera_name, " SAVED")
             else:
@@ -179,7 +180,7 @@ class Camera:
         else:
             return
     
-    def gamma_correction(frame, gamma):
+    def gamma_correction(self, frame, gamma):
         '''
         Perform gamma correction so the image doesn't look too bright
         or dark in different environment
@@ -266,7 +267,6 @@ class CameraHandler:
 
         # Define a Color Camera Node for getting image frames from camera
         cam_rgb = pipeline.create(dai.node.ColorCamera)
-        cam_rgb.setFps(10) # Set low FPS so that auto exposure has a wider range
 
         # Define xLinkIn node for receiving capture image event from host device
         xin_still = pipeline.create(dai.node.XLinkIn)

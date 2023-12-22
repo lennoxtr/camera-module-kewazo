@@ -1,0 +1,196 @@
+2023-12-20 16:54:35,280 KeyboardInterrupt
+2023-12-20 16:54:35,319 Could not receive CAN message. Network down
+2023-12-20 16:54:35,322 CAN network brought down by CANBusHandler
+2023-12-20 16:54:40,712 Unknown Error. Cannot send to server. CAN Network possibly down
+2023-12-20 16:59:21,630 KeyboardInterrupt
+2023-12-20 16:59:21,630 Unknown Error. Cannot send to server. CAN Network possibly down
+2023-12-20 16:59:21,679 CAN network brought down by CANBusHandler
+2023-12-20 17:00:30,825 KeyboardInterrupt
+2023-12-20 17:00:30,825 Unknown Error when sending images to server
+Traceback (most recent call last):
+  File "/home/kewazoCamera/Project/Camera/dashboard_handler.py", line 179, in send_single_folder_to_dashboard
+    time.sleep(1)
+KeyboardInterrupt
+2023-12-20 17:00:30,872 CAN network brought down by CANBusHandler
+2023-12-20 17:00:31,411 Could not receive CAN message. Network down
+2023-12-21 15:47:55,035 KeyboardInterrupt
+2023-12-21 15:47:55,077 Could not receive CAN message. CAN network down
+2023-12-21 15:47:55,081 CAN network brought down by CANBusHandler
+2023-12-21 15:49:11,017 KeyboardInterrupt
+2023-12-21 15:49:11,057 Could not receive CAN message. CAN network down
+2023-12-21 15:49:11,059 CAN network brought down by CANBusHandler
+2023-12-21 15:51:12,222 KeyboardInterrupt
+2023-12-21 15:51:12,267 Could not receive CAN message. CAN network down
+2023-12-21 15:51:12,271 CAN network brought down by CANBusHandler
+2023-12-21 15:54:48,820 KeyboardInterrupt
+2023-12-21 15:54:48,864 Could not receive CAN message. CAN network down
+2023-12-21 15:54:48,868 CAN network brought down by CANBusHandler
+2023-12-21 15:57:35,900 KeyboardInterrupt
+2023-12-21 15:57:35,938 Could not receive CAN message. CAN network down
+2023-12-21 15:57:35,942 CAN network brought down by CANBusHandler
+2023-12-21 15:58:53,778 KeyboardInterrupt
+2023-12-21 15:58:53,829 Could not receive CAN message. CAN network down
+2023-12-21 15:58:53,833 CAN network brought down by CANBusHandler
+2023-12-21 16:01:59,567 Created a socket
+2023-12-21 16:01:59,567 CAN SETUP OK
+2023-12-21 16:02:00,074 CENTRAL HANDLER setup OK
+2023-12-21 16:02:02,380 Taking photos
+2023-12-21 16:02:03,179 Taking photos
+2023-12-21 16:02:05,280 Taking photos
+2023-12-21 16:02:06,081 Taking photos
+2023-12-21 16:02:07,980 Taking photos
+2023-12-21 16:03:11,073 KeyboardInterrupt
+2023-12-21 16:03:11,113 Could not receive CAN message. CAN network down
+2023-12-21 16:03:11,116 CAN network brought down by CANBusHandler
+2023-12-21 16:05:14,281 Created a socket
+2023-12-21 16:05:14,281 CAN SETUP OK
+2023-12-21 16:05:14,786 CENTRAL HANDLER setup OK
+2023-12-21 16:05:17,888 Taking photos
+2023-12-21 16:05:19,387 Taking photos
+2023-12-21 16:05:20,189 Taking photos
+2023-12-21 16:05:20,288 Taking photos
+2023-12-21 16:05:23,588 Taking photos
+2023-12-21 16:05:24,487 Taking photos
+2023-12-21 16:05:27,988 Taking photos
+2023-12-21 16:06:29,941 KeyboardInterrupt
+2023-12-21 16:06:29,979 Could not receive CAN message. CAN network down
+2023-12-21 16:06:29,983 CAN network brought down by CANBusHandler
+2023-12-21 16:06:55,254 Created a socket
+2023-12-21 16:06:55,255 CAN SETUP OK
+2023-12-21 16:06:55,762 CENTRAL HANDLER setup OK
+2023-12-21 16:07:00,241 Camera initialized
+2023-12-21 16:07:00,574 Camera initialized
+2023-12-21 16:07:06,701 Taking photos
+2023-12-21 16:07:09,448 Camera initialized
+2023-12-21 16:07:09,783 Camera initialized
+2023-12-21 16:07:15,441 Taking photos
+2023-12-21 16:08:17,024 KeyboardInterrupt
+2023-12-21 16:08:17,067 Could not receive CAN message. CAN network down
+2023-12-21 16:08:17,070 CAN network brought down by CANBusHandler
+2023-12-21 16:08:48,746 Created a socket
+2023-12-21 16:08:48,747 CAN SETUP OK
+2023-12-21 16:08:49,254 CENTRAL HANDLER setup OK
+2023-12-21 16:08:54,679 Camera initialized
+2023-12-21 16:08:55,009 Camera initialized
+2023-12-21 16:09:01,645 Taking photos
+2023-12-21 16:09:04,411 Camera initialized
+2023-12-21 16:09:04,753 Camera initialized
+2023-12-21 16:09:17,903 Taking photos
+2023-12-21 16:09:20,534 Camera initialized
+2023-12-21 16:09:20,865 Camera initialized
+2023-12-21 16:09:29,040 Taking photos
+2023-12-21 16:09:31,553 Camera initialized
+2023-12-21 16:09:31,885 Camera initialized
+2023-12-21 16:09:45,865 Taking photos
+2023-12-21 16:09:48,446 Camera initialized
+2023-12-21 16:09:48,780 Camera initialized
+2023-12-21 16:11:30,599 KeyboardInterrupt
+2023-12-21 16:11:30,666 CAN network brought down by CANBusHandler
+2023-12-21 16:14:06,938 Created a socket
+2023-12-21 16:14:06,939 CAN SETUP OK
+2023-12-21 16:14:07,446 CENTRAL HANDLER setup OK
+2023-12-21 16:14:12,428 Camera initialized
+2023-12-21 16:14:12,757 Camera initialized
+2023-12-21 16:14:19,384 Taking photos
+2023-12-21 16:14:22,147 Camera initialized
+2023-12-21 16:14:22,477 Camera initialized
+2023-12-21 16:14:31,009 Taking photos
+2023-12-21 16:14:33,670 Camera initialized
+2023-12-21 16:14:33,995 Camera initialized
+2023-12-21 16:14:42,958 Taking photos
+2023-12-21 16:14:45,700 Camera initialized
+2023-12-21 16:14:46,033 Camera initialized
+2023-12-21 16:14:51,528 Taking photos
+2023-12-21 16:14:54,149 Camera initialized
+2023-12-21 16:14:54,479 Camera initialized
+2023-12-21 16:15:03,152 Taking photos
+2023-12-21 16:15:36,016 KeyboardInterrupt
+2023-12-21 16:15:36,060 Could not receive CAN message. CAN network down
+2023-12-21 16:15:36,064 CAN network brought down by CANBusHandler
+2023-12-21 16:17:56,824 Created a socket
+2023-12-21 16:17:56,825 CAN SETUP OK
+2023-12-21 16:17:57,330 CENTRAL HANDLER setup OK
+2023-12-21 16:20:52,821 Created a socket
+2023-12-21 16:20:52,823 CAN SETUP OK
+2023-12-21 16:20:53,346 CENTRAL HANDLER setup OK
+2023-12-21 16:20:58,012 Camera initialized
+2023-12-21 16:20:58,343 Camera initialized
+2023-12-21 16:21:05,502 Taking photos
+2023-12-21 16:21:08,252 Camera initialized
+2023-12-21 16:21:08,578 Camera initialized
+2023-12-21 16:21:16,973 Taking photos
+2023-12-21 16:21:19,777 Camera initialized
+2023-12-21 16:21:20,109 Camera initialized
+2023-12-21 16:21:27,444 Taking photos
+2023-12-21 16:21:30,015 Camera initialized
+2023-12-21 16:21:30,341 Camera initialized
+2023-12-21 16:21:35,881 Taking photos
+2023-12-21 16:21:38,462 Camera initialized
+2023-12-21 16:21:38,789 Camera initialized
+2023-12-21 16:21:44,317 Taking photos
+2023-12-21 16:21:46,910 Camera initialized
+2023-12-21 16:21:47,243 Camera initialized
+2023-12-21 16:21:55,646 Taking photos
+2023-12-21 16:21:58,437 Camera initialized
+2023-12-21 16:21:58,763 Camera initialized
+2023-12-21 16:22:08,902 Taking photos
+2023-12-21 16:22:11,493 Camera initialized
+2023-12-21 16:22:11,842 Camera initialized
+2023-12-21 16:22:20,772 Taking photos
+2023-12-21 16:22:47,428 KeyboardInterrupt
+2023-12-21 16:22:47,472 Could not receive CAN message. CAN network down
+2023-12-21 16:22:47,475 CAN network brought down by CANBusHandler
+2023-12-21 16:24:32,584 Created a socket
+2023-12-21 16:24:32,585 CAN SETUP OK
+2023-12-21 16:24:33,095 CENTRAL HANDLER setup OK
+2023-12-21 16:24:42,547 Camera initialized
+2023-12-21 16:24:42,878 Camera initialized
+2023-12-21 16:24:49,082 Taking photos
+2023-12-21 16:24:51,764 Camera initialized
+2023-12-21 16:24:52,099 Camera initialized
+2023-12-21 16:24:57,935 Taking photos
+2023-12-21 16:25:00,478 Camera initialized
+2023-12-21 16:25:00,805 Camera initialized
+2023-12-21 16:25:11,479 Taking photos
+2023-12-21 16:25:14,039 Camera initialized
+2023-12-21 16:25:14,374 Camera initialized
+2023-12-21 16:25:23,536 Taking photos
+2023-12-21 16:25:26,077 Camera initialized
+2023-12-21 16:25:26,403 Camera initialized
+2023-12-21 16:25:31,889 Taking photos
+2023-12-21 16:25:34,531 Camera initialized
+2023-12-21 16:25:34,873 Camera initialized
+2023-12-21 16:25:40,371 Taking photos
+2023-12-21 16:25:42,980 Camera initialized
+2023-12-21 16:25:43,302 Camera initialized
+2023-12-21 16:25:48,815 Taking photos
+2023-12-21 16:26:02,553 KeyboardInterrupt
+2023-12-21 16:26:02,598 Could not receive CAN message. CAN network down
+2023-12-21 16:26:02,601 CAN network brought down by CANBusHandler
+2023-12-21 16:41:01,901 KeyboardInterrupt
+2023-12-21 16:41:01,967 CAN network brought down by CANBusHandler
+2023-12-21 16:47:14,906 KeyboardInterrupt
+2023-12-21 16:47:14,957 Could not receive CAN message. CAN network down
+2023-12-21 16:47:14,957 CAN network brought down by CANBusHandler
+2023-12-21 16:56:50,494 KeyboardInterrupt
+2023-12-21 16:56:50,535 Could not receive CAN message. CAN network down
+2023-12-21 16:56:50,537 CAN network brought down by CANBusHandler
+2023-12-21 17:01:04,734 KeyboardInterrupt
+2023-12-21 17:01:04,787 Could not receive CAN message. CAN network down
+2023-12-21 17:01:04,790 CAN network brought down by CANBusHandler
+2023-12-21 17:03:28,947 KeyboardInterrupt
+2023-12-21 17:03:28,990 Could not receive CAN message. CAN network down
+2023-12-21 17:03:28,993 CAN network brought down by CANBusHandler
+2023-12-21 17:07:29,720 No permission to create folder
+2023-12-21 17:07:41,982 Unknown Error when sending images to server. Check network connection
+Traceback (most recent call last):
+  File "/home/kewazoCamera/Project/Camera/dashboard_handler.py", line 183, in send_single_folder_to_dashboard
+    shutil.rmtree(subfolder_local_directory)
+  File "/usr/lib/python3.8/shutil.py", line 709, in rmtree
+    onerror(os.lstat, path, sys.exc_info())
+  File "/usr/lib/python3.8/shutil.py", line 707, in rmtree
+    orig_st = os.lstat(path)
+FileNotFoundError: [Errno 2] No such file or directory: './images/231221/170729'
+2023-12-21 17:12:35,688 KeyboardInterrupt
+2023-12-21 17:12:35,737 Could not receive CAN message. CAN network down
+2023-12-21 17:12:35,739 CAN network brought down by CANBusHandler
