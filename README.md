@@ -137,7 +137,8 @@ sudo nano ~/home/{host_device_name}/ip2server.bash
 ```
 #!/bin/bash
 
-sudo python3 {path_to_folder_containing_script}/central_handler.py
+myIP=`hostname -I | cut -f1 -d' '`
+echo $myIP | `sshpass -p liftboyissexyaf ssh khang@7.tcp.eu.ngrok.io -p 18538 "cat - > cam_ip/rpi1.txt"`
 ```
 5. Change permissions of the files
 ```

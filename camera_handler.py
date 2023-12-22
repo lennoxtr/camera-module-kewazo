@@ -161,7 +161,7 @@ class Camera:
                 if brightness > 130:
                     self.brightness_control -= 1
                     try:
-                        shutil.rmtree(timestamp_saving_directory)
+                        shutil.rmtree(image_file_directory)
                     except Exception:
                         return
                     return
