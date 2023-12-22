@@ -153,10 +153,23 @@ class Camera:
 
         if image_output_queue.has():
             frame = image_output_queue.get().getCvFrame()
+
             # Analyze brightness of image to adjust camera exposure for
             # different lighting environments.
+            #
+            # Brightness is calculated using geometric mean of R, G, B
+            # channels of a picture
             
             brightness = np.average(norm(frame, axis=2)) / np.sqrt(3)
+
+
+            # If brightness is too great or too low, gamma correction
+            # would return weird images.
+            #
+            # The idea here is that if brightness is too great or too
+            # low, the images won't be sent. Instead, the brightness of
+            # the next image taken will be increased or decreased
+
             if brightness > 130 or brightness < 40:
                 if brightness > 130:
                     self.brightness_control -= 1
@@ -172,7 +185,8 @@ class Camera:
                     except Exception:
                         return
                     return
-            counter = 0
+                
+            counter = 0 # Counter to prevent infinite loop
             while (counter < 10) and (brightness > self.BRIGHTNESS_HIGH or brightness < self.BRIGHTNESS_LOW):
                 # Adjusting gamma values
                 if brightness > self.BRIGHTNESS_HIGH:
